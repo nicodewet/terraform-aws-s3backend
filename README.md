@@ -12,6 +12,8 @@ A workspace needs the following variables defined in order to initialize and dep
 - Amazon Resource Name (ARN) of the role that can be assumed
 - Name of the DynamoDB table
 
+In this module we follow the [Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure).
+
 ## S3 Backend Module Overview
 
 ![S3 backend flow](readme_pics/s3_backend_module_flow.png)
