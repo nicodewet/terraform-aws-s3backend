@@ -50,7 +50,7 @@ resource "aws_resourcegroups_group" "resourcegroups_group" {
 resource "aws_kms_key" "kms_key" {
   tags = {
     ResourceGroup = local.namespace
-    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
+    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
   }
 }
 
@@ -68,7 +68,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 
   tags = {
     ResourceGroup = local.namespace
-    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
+    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
   }
 }
 
@@ -115,6 +115,6 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   }
   tags = {
     ResourceGroup = local.namespace
-    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
+    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
   }
 }
