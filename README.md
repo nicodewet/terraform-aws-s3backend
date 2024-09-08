@@ -14,6 +14,16 @@ A workspace needs the following variables defined in order to initialize and dep
 
 In this module we follow the [Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure).
 
+## Setup Instructions
+
+You should use the published module in another Terraform project, e.g. named *s3backend_deploy*.
+
+As you would expect by convention the input variables are in the file *variables.tf*
+
+You need to specify the **namespace** which should be your team name, or some other appropriate team name. Do not use the default value. The notion of team is mentioned because a key purpose of the S3 Backend Module is to share state between people. But it could also just be your personal state, in that case perhaps use your name (nico in my case) or company name (thorgil in my case).
+
+Next you'll need to specify **principal_arns** and also the **force_destroy_state** which is true by default.
+
 ## S3 Backend Module Overview
 
 ![S3 backend flow](readme_pics/s3_backend_module_flow.png)

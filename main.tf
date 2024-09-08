@@ -17,7 +17,9 @@ resource "random_string" "rand" {
 }
 
 locals {
-  namespace = substr( join("-", [var.namespace, random_string.rand.result]), 0, 24 )
+  namespace = substr( join("-", [var.namespace, random_string.rand.result, "terraform-3backend"]), 0, 24 )
+  resource_stack_type_tag_key = "iac-stack-type" 
+  resource_stack_type_tag_value = "team-terraform-3backend"
 }
 
 /************************************************************
@@ -26,7 +28,7 @@ locals {
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/resourcegroups_group
 *************************************************************/
 resource "aws_resourcegroups_group" "resourcegroups_group" {
-  name = "${local.namespace}-group"
+  name = "${local.namespace}-terraform-group"
 
   resource_query {
     query = <<-JSON
@@ -48,6 +50,7 @@ resource "aws_resourcegroups_group" "resourcegroups_group" {
 resource "aws_kms_key" "kms_key" {
   tags = {
     ResourceGroup = local.namespace
+    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
   }
 }
 
@@ -65,6 +68,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 
   tags = {
     ResourceGroup = local.namespace
+    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
   }
 }
 
@@ -94,9 +98,12 @@ resource "aws_s3_bucket_public_access_block" "s3_bucket" {
   restrict_public_buckets = true
 }
 
-/*********************************************************************
+/*******************************************************************************************
 * Pay per request Makes the database serverless instead of provisioned
-**********************************************************************/
+*
+* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dynamodb_table
+*
+********************************************************************************************/
 
 resource "aws_dynamodb_table" "dynamodb_table" {
   name         = "${local.namespace}-state-lock"
@@ -108,5 +115,6 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   }
   tags = {
     ResourceGroup = local.namespace
+    local.resource_stack_type_tag_key = local.resource_stack_type_tag_value
   }
 }
