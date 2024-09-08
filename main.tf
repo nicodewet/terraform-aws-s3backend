@@ -19,7 +19,7 @@ resource "random_string" "rand" {
 locals {
   namespace = substr( join("-", [var.namespace, random_string.rand.result, "terraform-3backend"]), 0, 24 )
   resource_stack_type_tag_key = "iac-stack-type" 
-  resource_stack_type_tag_value = "team-terraform-3backend"
+  resource_stack_type_tag_value = "team-terraform-s3backend"
 }
 
 /************************************************************
