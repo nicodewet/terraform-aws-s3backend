@@ -70,7 +70,14 @@ resource "aws_resourcegroups_group" "resourcegroups_group" {
   }
 }
 
+/***********************************************************************************
+* KMS key required by the s3_encryption resource
+* 
+* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
+*************************************************************************************/
 resource "aws_kms_key" "kms_key" {
+  key_id = "${local.namespace}-kms-key"
+  description = "Used to encrypts S3 Backend Module S3 state at rest"
   tags = {
     // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
@@ -125,12 +132,12 @@ resource "aws_s3_bucket_public_access_block" "s3_bucket" {
   restrict_public_buckets = true
 }
 
-/*******************************************************************************************
-* Pay per request Makes the database serverless instead of provisioned
+/*************************************************************************************************************
+* Pay per request makes the database serverless instead of provisioned
 *
+* https://aws.amazon.com/blogs/aws/amazon-dynamodb-on-demand-no-capacity-planning-and-pay-per-request-pricing/
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dynamodb_table
-*
-********************************************************************************************/
+**************************************************************************************************************/
 
 resource "aws_dynamodb_table" "dynamodb_table" {
   name         = "${local.namespace}-state-lock"
