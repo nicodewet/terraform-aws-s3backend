@@ -17,16 +17,39 @@ resource "random_string" "rand" {
 }
 
 locals {
+  /**
+  * Prefix with built in uniqueness used in all S3 Backend Module resource names and AWS Resource Group tag values.
+  */
   namespace = substr( join("-", [var.namespace, random_string.rand.result, "terraform-3backend"]), 0, 24 )
-  resource_stack_type_tag_key = "iac-stack-type" 
-  resource_stack_type_tag_value = "team-terraform-s3backend"
+  /** 
+  * The resource_tag_name is the value of the "Tag: Name" which is mainly important from an AWS Console
+  * use case perspective. It matters for the following AWS Console user-friendliness centered use cases. Note, 
+  * these use cases don't matter when solely relying on Terraform for managing and organizing resources (without 
+  * much manual interaction in the AWS Console).
+  *
+  * 1. Ease of Identification: It makes it easier to identify and manage resources in the AWS Console. Without 
+  *                            a Name tag, resources can appear only with unique identifiers making it more 
+  *                            challenging to differentiate between them.
+  * 2. Search & Filtering in AWS Console: The Name tag is frequently used for filtering and searching resources 
+  *                          within the AWS Management Console.
+  * 3. Resource Groups: When using AWS Resource Groups and tagging-based resource management, as we do in this 
+  *                    S3 Backend Module, having consistent tags, including Name, improves the usability of these 
+  *                    tools. 
+  */
+  resource_aws_console_tag_name = "terraform-s3backend-component"
 }
 
-/************************************************************
-* Put resources into a group based on tag
+/*******************************************************************************************************
+* Put resources into a query-based AWS Resource Groups group based on the common tag filter namely the 
+* ResourceGroup key and local.namespace value.
 *
+* Our TagFilter Key of ResourceGroup and Value of local.namespace places a constraint on any S3 Backend 
+* Module resources that we privision. The key of ResourceGroup and value of local.namespace MUST be used
+* in order for the mentioned TagFilter to function.
+*
+* https://docs.aws.amazon.com/ARG/latest/userguide/gettingstarted-query.html
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/resourcegroups_group
-*************************************************************/
+******************************************************************************************************/
 resource "aws_resourcegroups_group" "resourcegroups_group" {
   name = "${local.namespace}-terraform-group"
 
@@ -49,8 +72,10 @@ resource "aws_resourcegroups_group" "resourcegroups_group" {
 
 resource "aws_kms_key" "kms_key" {
   tags = {
+    // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
-    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
+    // The following tag is required from an AWS Console user-friendliness perspective.
+    Name = "${local.resource_aws_console_tag_name}"
   }
 }
 
@@ -67,8 +92,10 @@ resource "aws_s3_bucket" "s3_bucket" {
   force_destroy = var.force_destroy_state
 
   tags = {
+    // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
-    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
+    // The following tag is required from an AWS Console user-friendliness perspective.
+    Name = "${local.resource_aws_console_tag_name}"
   }
 }
 
@@ -114,7 +141,9 @@ resource "aws_dynamodb_table" "dynamodb_table" {
     type = "S"
   }
   tags = {
+    // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
-    "${local.resource_stack_type_tag_key}" = "${local.resource_stack_type_tag_value}"
+    // The following tag is required from an AWS Console user-friendliness perspective.
+    Name = "${local.resource_aws_console_tag_name}"
   }
 }
