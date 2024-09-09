@@ -76,7 +76,9 @@ resource "aws_resourcegroups_group" "resourcegroups_group" {
 * https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
 *************************************************************************************/
 resource "aws_kms_key" "kms_key" {
-  key_id = "${local.namespace}-kms-key"
+  // NOTE the key_id is exported by this resource, you can't specify it, if you try you'll get:
+  //    Error: Value for unconfigurable attribute 
+  //    Can't configure a value for "key_id": its value will be decided automatically based on the result of applying this configuration.
   description = "Used to encrypts S3 Backend Module S3 state at rest"
   tags = {
     // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
