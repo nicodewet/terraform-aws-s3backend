@@ -14,6 +14,13 @@ A workspace needs the following variables defined in order to initialize and dep
 
 In this module we follow the [Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure).
 
+## References
+
+The following key references were leveraged in this work.
+
+- [Terraform in Action, Chapter 6, Scott Winkler](https://www.manning.com/books/terraform-in-action) *I highly recommend buying a copy of this book.* 
+- [Hashicorp S3 Backend Online Documentation](https://developer.hashicorp.com/terraform/language/settings/backends/s3)
+
 ## Setup Instructions
 
 You should use the published module in another Terraform project, e.g. named *s3backend_deploy*.
