@@ -18,6 +18,8 @@ In this module we follow the [Standard Module Structure](https://developer.hashi
 
 The following key references were leveraged in this work.
 
+The first one is the key reference that I used and I've updated the publically available [S3 Backend Module source](https://github.com/terraform-in-action/manning-code/tree/master/chapter6) to use the latest provider versions (amongst other adaptations).
+
 - [Terraform in Action, Chapter 6, Scott Winkler](https://www.manning.com/books/terraform-in-action) *I highly recommend buying a copy of this book.* 
 - [Hashicorp S3 Backend Online Documentation](https://developer.hashicorp.com/terraform/language/settings/backends/s3)
 
@@ -50,7 +52,7 @@ Four distinct components comprise the S3 backend module:
 
 The following diagram shows the four distinct components that make up the S3 Backend Module.
 
-## S3 Backend Module Architecture Diagram
+## S3 Backend Module Detailed Component Diagram
 
 ![S3 backend variables](readme_pics/s3_backend_module_components.png)
 
