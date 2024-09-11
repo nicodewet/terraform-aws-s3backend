@@ -39,7 +39,7 @@ The S3 backend module has 3 input variables and one output variable. The output 
 
 ## S3 Backend Module Input and Output Variables
 
-![S3 backend variables](readme_pics/S3_Module_Variables.png)
+![S3 backend variables](readme_pics/s3_module_variables.png)
 
 Four distinct components comprise the S3 backend module:
 
