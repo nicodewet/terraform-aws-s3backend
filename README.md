@@ -1,5 +1,13 @@
 # Production-ready S3 Backend Module
 
+## Context - Why?
+
+So often this kind of material is done for you, as a professional software engineer, with pre-established *guardrails* as the reasoning, or various pigeon holing titles.
+
+That makes sense. Unless you want to leearn about something and master it, so let's go.
+
+## Introduction
+
 The S3 backend module works as follows. State files are encrypted at rest using KMS. Access is controlled by a least-privileged IAM policy, and everything is synchronised with DynamoDB.
 
 The S3 backend module contains shared state and is used by developers to manage shared infrastructure using 
