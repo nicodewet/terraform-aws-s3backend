@@ -9,19 +9,19 @@ terraform {
     */ 
   backend "s3" {
     // from aws backend module output
-    bucket = "team-nico-exspfwog32lchd-state-bucket"
+    bucket = var.bucket
     /**
     * We HAVE TO create a unique key for our project, which is basically just a prefix
     * to the object stored in S3
     */
     key = "team1/my-cool-project"
     // from aws backend module output
-    region = "ap-southeast-2"
+    region = var.region
     encrypt = true
     // from aws backend module output
-    role_arn = "arn:aws:iam::111111111111:role/team-nico-exspfwog32lchd-tf-assume-role"
+    role_arn = var.role_arn
     // from aws backend module output
-    dynamodb_table = "team-nico-exspfwog32lchd-state-lock"
+    dynamodb_table = var.dynamodb_table
   }
   required_version = ">= 0.15"
   required_providers {

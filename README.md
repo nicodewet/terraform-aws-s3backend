@@ -83,7 +83,7 @@ Once these requirements have been met [semantically versioned GitHub release tag
 
 Resources have two tags:
 
-- The first has Key **ResourceGroup** is used by Terraform and has randomization built into the value (see main.tf in the S3 Backend Module).
+- The first has Key **ResourceGroup** which is used by Terraform and has randomisation built into the value (see main.tf in the S3 Backend Module).
 - The second has Key **Name** has the fixed value **terraform-s3backend-component** and is to populate this field in the AWS Console UI.
 
 Now for the S3 Backend Configuration. 
@@ -123,7 +123,8 @@ s3backend_module/exercises/s3backend_deploy  (git)-[main]- % terraform init && t
 
 In terms of the output, here is an example with identifiers scrambled. 
 
-Consider abstracting sensitive ARNs and this means using placeholders or environment variables instead of hardcoding them.
+In the next step, namely s3backend_test, we'll abstracting sensitive ARNs and this means using placeholders 
+or environment variables instead of hardcoding them.
 
 ```
 s3backend_config = {
@@ -136,7 +137,20 @@ s3backend_config = {
 
 ### s3backend_test
 
-TODO
+Firstly inspect test.tf and notice the variables in the s3 backend declaration section which we'll populate using environment variables 
+and command line flags.
+
+```
+s3backend_module/exercises/s3backend_test % export ROLE_ARN='arn:aws:iam::111111111111:role/team-nico-g502k751zdtty1-tf-assume-role'
+s3backend_module/exercises/s3backend_test % export DYNAMODB_TABLE='dynamodb_table=team-nico-g502k751zdtty1-state-lock'
+s3backend_module/exercises/s3backend_test % export REGION='ap-southeast-2'
+s3backend_module/exercises/s3backend_test % export BUCKET='team-nico-g502k751zdtty1-state-bucket'
+s3backend_module/exercises/s3backend_test % terraform init \                                                                        
+  -backend-config="bucket=$BUCKET" \
+  -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
+  -backend-config="region=$REGION" \
+  -backend-config="role_arn=$ROLE_ARN"
+```
 
 ### s3backend_with_workspaces
 
