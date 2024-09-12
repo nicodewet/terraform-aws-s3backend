@@ -19,7 +19,7 @@ terraform {
     region = "ap-southeast-2"
     encrypt = true
     // from aws backend module output
-    role_arn = "arn:aws:iam::339078945058:role/team-nico-exspfwog32lchd-tf-assume-role"
+    role_arn = "arn:aws:iam::111111111111:role/team-nico-exspfwog32lchd-tf-assume-role"
     // from aws backend module output
     dynamodb_table = "team-nico-exspfwog32lchd-state-lock"
   }
