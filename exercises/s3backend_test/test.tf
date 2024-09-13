@@ -32,12 +32,22 @@ terraform {
   }
 }
 
-resource "null_resource" "motto" {
+/**
+* The null_resource is a placeholder resource that doesn't create any infrastructure but can
+* trigger provisioners based on changes to its triggers argument.
+*/
+resource "null_resource" "DI_FM_Radio" {
     triggers = {
-        always = timestamp()
+      /**
+      * The triggers block in null_resource ensures that the local-exec command is 
+      * run every time Terraform applies, because timestamp() makes the resource 
+      * change every time it's run.
+      */
+        always = timestamp() # This ensures the command will always run.
     }
     provisioner "local-exec" {
-        // this is where the magic happens
-        command = "echo gotta catch em all"
+        // The actual command you want to run locally. This can be anything 
+        // executable on your local machine.
+        command = "echo 'Bass & Jackin House'"
     }
 }

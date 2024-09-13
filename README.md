@@ -148,16 +148,71 @@ s3backend_config = {
 Firstly inspect test.tf and notice the variables in the s3 backend declaration section which we'll populate using environment variables 
 and command line flags.
 
+The s3 backend configuration with the variable declerations follows.
+
+```
+backend "s3" {
+    // from aws backend module output
+    bucket = var.bucket
+    /**
+    * We HAVE TO create a unique key for our project, which is basically just a prefix
+    * to the object stored in S3
+    */
+    key = "team1/my-cool-project"
+    // from aws backend module output
+    region = var.region
+    encrypt = true
+    // from aws backend module output
+    role_arn = var.role_arn
+    // from aws backend module output
+    dynamodb_table = var.dynamodb_table
+  }
+```
+
+Now initialise Terraform and the s3 backend in particular.
+
 ```
 s3backend_module/exercises/s3backend_test % export ROLE_ARN='arn:aws:iam::111111111111:role/team-nico-g502k751zdtty1-tf-assume-role'
-s3backend_module/exercises/s3backend_test % export DYNAMODB_TABLE='dynamodb_table=team-nico-g502k751zdtty1-state-lock'
+s3backend_module/exercises/s3backend_test % export DYNAMODB_TABLE='team-nico-g502k751zdtty1-state-lock'
 s3backend_module/exercises/s3backend_test % export REGION='ap-southeast-2'
 s3backend_module/exercises/s3backend_test % export BUCKET='team-nico-g502k751zdtty1-state-bucket'
-s3backend_module/exercises/s3backend_test % terraform init \                                                                        
-  -backend-config="bucket=$BUCKET" \
-  -backend-config="dynamodb_table=$DYNAMODB_TABLE" \
-  -backend-config="region=$REGION" \
-  -backend-config="role_arn=$ROLE_ARN"
+s3backend_module/exercises/s3backend_test % terraform init \
+-backend-config="bucket=$BUCKET" \
+-backend-config="dynamodb_table=$DYNAMODB_TABLE" \
+-backend-config="region=$REGION" \
+-backend-config="role_arn=$ROLE_ARN"
+```
+
+So now let's get the [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) to do 
+run a command locally as a test, then run it again to convince yourself the null_resource will be replaced on each run.
+
+```
+s3backend_module/exercises/s3backend_test % terraform apply -auto-approve
+null_resource.DI_FM_Radio: Refreshing state... [id=6831082778838108296]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # null_resource.DI_FM_Radio must be replaced
+-/+ resource "null_resource" "DI_FM_Radio" {
+      ~ id       = "6831082778838108296" -> (known after apply)
+      ~ triggers = { # forces replacement
+          ~ "always" = "2024-09-13T23:43:37Z" -> (known after apply)
+        }
+    }
+
+Plan: 1 to add, 0 to change, 1 to destroy.
+null_resource.DI_FM_Radio: Destroying... [id=6831082778838108296]
+null_resource.DI_FM_Radio: Destruction complete after 0s
+null_resource.DI_FM_Radio: Creating...
+null_resource.DI_FM_Radio: Provisioning with 'local-exec'...
+null_resource.DI_FM_Radio (local-exec): Executing: ["/bin/sh" "-c" "echo 'Bass & Jackin House'"]
+null_resource.DI_FM_Radio (local-exec): Bass & Jackin House
+null_resource.DI_FM_Radio: Creation complete after 0s [id=3461312214203961120]
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
 ```
 
 ### s3backend_with_workspaces
