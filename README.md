@@ -215,6 +215,19 @@ null_resource.DI_FM_Radio: Creation complete after 0s [id=3461312214203961120]
 Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
 ```
 
+As a final check, navigate to the Resource Groups view on the AWS Console, your team's S3 backend should be easy to find. Then click on the S3
+component and notice the *team1* folder with *my-cool-project* state file.
+
+A swifter way of figuring out what state exists is to run the *state list* command as follows.
+
+```
+s3backend_module/exercises/s3backend_test % terraform state list
+null_resource.DI_FM_Radio
+```
+
+At this stage we've made good progress, but we'll want to use workspaces to be truly effective in a team environment. We'll move onto the next 
+section for that.
+
 ### s3backend_with_workspaces
 
 TODO

@@ -10,12 +10,12 @@ terraform {
     */ 
   backend "s3" {
     // from aws backend module output
-    bucket = "team-nico-exspfwog32lchd-state-bucket"
+    bucket = var.bucket
     /**
     * We HAVE TO create a unique key for our project, which is basically just a prefix
     * to the object stored in S3
     */
-    key = "jesse/james"
+    key = "team1/another-cool-project"
     /**
     * This is the region where the remote state backend lives and may be different 
     * than the region being deployed to. It cannot be configured via a variable as 
@@ -23,12 +23,12 @@ terraform {
     * 
     * from aws backend module output
     */ 
-    region = "ap-southeast-2"
+    region = var.region
     encrypt = true
     // from aws backend module output
-    role_arn = "arn:aws:iam::339078945058:role/team-nico-exspfwog32lchd-tf-assume-role"
+    role_arn = var.role_arn
     // from aws backend module output
-    dynamodb_table = "team-nico-exspfwog32lchd-state-lock"
+    dynamodb_table = var.dynamodb_table
   }
   required_version = ">= 0.15"
   required_providers {
