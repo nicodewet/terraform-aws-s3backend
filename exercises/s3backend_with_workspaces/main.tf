@@ -17,11 +17,10 @@ terraform {
     */
     key = "team1/another-cool-project"
     /**
-    * This is the region where the remote state backend lives and may be different 
-    * than the region being deployed to. It cannot be configured via a variable as 
-    * it is evaluated during initialization. 
-    * 
-    * from aws backend module output
+    * This is the region where the remote state backend lives and may be different than the region being deployed to.
+    * It cannot be configured via a variable in an environment variable definition file as it is evaluated during
+    * initialization. We have parameterised it during Terraform initialisation however using a command line flag
+    * via -backend-config="region=$REGION"
     */ 
     region = var.region
     encrypt = true

@@ -230,7 +230,92 @@ section for that.
 
 ### s3backend_with_workspaces
 
-TODO
+#### Why workspaces?
+
+Workspaces give you the ability to have more than one state file with the same configuration code.
+
+Each workspace has a variable definitions file to parameterize the environment. The net benefit is not having to copy and past configuration code
+on a per environment basis.
+
+### Implementation
+
+The S3 backend initialization is as before in terms of feeding environment variables into the backend-config command line parameters.
+
+We want to avoid using the *default* workspace which is what you would be on after initialisaing Terraform without specifying a workspace. 
+We'll confirm this first and then dive into targeted workspace initialization.
+
+#### The default workspace
+
+This example is just to illustrate the behaviour of Terraform directly after initialisation.
+
+```
+s3backend_module/exercises/s3backend_with_workspaces % terraform init \
+-backend-config="bucket=$BUCKET" \
+-backend-config="dynamodb_table=$DYNAMODB_TABLE" \
+-backend-config="region=$REGION" \
+-backend-config="role_arn=$ROLE_ARN"
+s3backend_module/exercises/s3backend_with_workspaces % terraform workspace list
+* default
+```
+
+We'll now move onto using our **environments/dev.tfvars** and **environments/prod.tfvars** workspace variable definition files.
+
+#### Using environment workspace definition files
+
+A feature branch name or more traditional environment name could be used. Here we're using *dev* and *prod*.
+
+It is best to switch to a non default environment immediately.
+
+Take a look at main.tf and environments/dev.tfvars to see we'll be deploying an EC2 instance to the **ap-southeast-2** region (Sydney).
+
+```
+s3backend_module/exercises/s3backend_with_workspaces  (git)-[main]- % terraform workspace new dev
+Created and switched to workspace "dev"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+s3backend_module/exercises/s3backend_with_workspaces % terraform apply -var-file=./environments/dev.tfvars -auto-approve
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+Now let's switch to the *prod* workspace and launch an EC2 instance in the ap-northeast-1 (Tokyo) region.
+
+```
+3backend_module/exercises/s3backend_with_workspaces % terraform workspace new prod
+Created and switched to workspace "prod"!
+s3backend_module/exercises/s3backend_with_workspaces % terraform apply -var-file=./environments/prod.tfvars -auto-approve
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+The image that follows shows what our state looks like after these two deployments. There will still be *default* state at 
+the top level because we did not use environment workspaces in our *s3backend_test* exercise.
+
+![S3 backend variables](readme_pics/S3_State_Env_Workspaces.png)
+
+#### Cleanup
+
+Let's delete the EC2 instance from each environment and then also delete the entire S3 backend to competely clean up. Of course
+you won't do the latter in a team environment but this is an exercise.
+
+Our configuration is still set at the prod environment so that will get destroyed first. We'll then switch to dev and then
+navigate to the s3backend_deploy directory to destroy the S3 backend.
+
+If you forget to specify the region (by not including the -var-file=./environments/prod.tfvars) you'll be prompted for the 
+variable value.
+
+```
+s3backend_module/exercises/s3backend_with_workspaces % terraform destroy -var-file=./environments/prod.tfvars -auto-approve
+Destroy complete! Resources: 1 destroyed.
+s3backend_module/exercises/s3backend_with_workspaces % terraform workspace select dev
+Switched to workspace "dev".
+s3backend_module/exercises/s3backend_with_workspaces % terraform destroy -var-file=./environments/dev.tfvars -auto-approve
+Destroy complete! Resources: 1 destroyed.
+s3backend_module/exercises/s3backend_with_workspaces % cd ../s3backend_deploy
+s3backend_module/exercises/s3backend_deploy % terraform destroy -auto-approve
+Destroy complete! Resources: 11 destroyed.
+```
 
 ## Future Work
 
