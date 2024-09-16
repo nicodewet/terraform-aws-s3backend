@@ -4,7 +4,7 @@
 
 So often this kind of material is done for you, as a professional software engineer, with pre-established *guardrails* as the reasoning, or various pigeon holing titles.
 
-That makes sense. Unless you want to leearn about something and master it, so let's go.
+That makes sense. Unless you want to learn about something and master it, so let's go.
 
 ## Introduction
 
