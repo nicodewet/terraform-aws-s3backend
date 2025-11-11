@@ -340,3 +340,11 @@ registry, ensuring consistent version management.
 
 - **Confidence for Public Users**: As it's publicly available, external users will have more confidence in a module that is 
 rigorously tested and maintained.
+
+## Cloud infrastructure configuration checking
+
+Using a tool such as [Checkov](https://www.checkov.io) is a goal. It doesn't need to be this specific tool - paying is fine.
+
+```
+$ docker run --tty --volume "$(pwd)":/tf --workdir /tf bridgecrew/checkov --directory /tf
+```
