@@ -1,0 +1,39 @@
+name: Terraform Checks
+
+# Run this workflow on:
+# - any push to any branch
+# - any pull request targeting any branch
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  tf-checks:
+    name: Run Terraform Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Terraform
+      # Using HashiCorp's official setup-terraform action
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.13.5  # Exact version to match your script
+
+      # Step 3: Install jq (required for version check)
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Step 4: Make script executable
+      - name: Make tf-checks.sh executable
+        run: chmod +x ci/tf-checks.sh
+
+      # Step 5: Run the script
+      - name: Run Terraform checks
+        run: ./ci/tf-checks.sh
