@@ -22,10 +22,15 @@ jobs:
         with:
           terraform_version: 1.13.5
 
-      # Step 3: Make script executable
+      # Step 3: Test Terraform installation
+      # This prints the Terraform version so we can debug any EPIPE issues
+      - name: Test Terraform version
+        run: terraform version
+
+      # Step 4: Make tf-checks.sh executable
       - name: Make tf-checks.sh executable
         run: chmod +x ci/tf-checks.sh
 
-      # Step 4: Run the script
+      # Step 5: Run the script
       - name: Run Terraform checks
         run: ./ci/tf-checks.sh
