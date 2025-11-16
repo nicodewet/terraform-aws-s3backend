@@ -1,0 +1,36 @@
+name: Terraform Checks
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  tf-checks:
+    name: Run Terraform Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Terraform (exact version)
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.13.5
+
+      # Step 3: Test Terraform installation
+      # This prints the Terraform version so we can debug any EPIPE issues
+      - name: Test Terraform version
+        run: terraform version
+
+      # Step 4: Make tf-checks.sh executable
+      - name: Make tf-checks.sh executable
+        run: chmod +x ci/tf-checks.sh
+
+      # Step 5: Run the script
+      - name: Run Terraform checks
+        run: ./ci/tf-checks.sh

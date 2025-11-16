@@ -20,7 +20,7 @@ locals {
   /**
   * Prefix with built in uniqueness used in all S3 Backend Module resource names and AWS Resource Group tag values.
   */
-  namespace = substr( join("-", [var.namespace, random_string.rand.result, "terraform-3backend"]), 0, 24 )
+  namespace = substr(join("-", [var.namespace, random_string.rand.result, "terraform-3backend"]), 0, 24)
   /** 
   * The resource_tag_name is the value of the "Tag: Name" which is mainly important from an AWS Console
   * use case perspective. It matters for the following AWS Console user-friendliness centered use cases. Note, 
@@ -118,11 +118,11 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
   bucket = aws_s3_bucket.s3_bucket.id
   rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.kms_key.arn
-      }
-    } 
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.kms_key.arn
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_bucket_access_config" {

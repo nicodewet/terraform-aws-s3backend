@@ -348,3 +348,25 @@ Using a tool such as [Checkov](https://www.checkov.io) is a goal. It doesn't nee
 ```
 $ docker run --tty --volume "$(pwd)":/tf --workdir /tf bridgecrew/checkov --directory /tf
 ```
+
+## Terraform Local Checks
+
+We provide a helper script to run basic Terraform checks locally:
+
+- **Checks formatting** with `terraform fmt`
+- **Performs static validation** with `terraform validate`
+
+### How to run locally
+
+1. Make sure Terraform is installed and available in your PATH.
+2. Make the script executable (one-time setup):
+
+```bash
+$ chmod +x ci/tf-checks.sh
+```
+
+3. Run the script:
+
+```bash
+$ 
+```
