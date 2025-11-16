@@ -3,16 +3,16 @@
 ********************************************************************************************/
 
 provider "aws" {
-    region  = "ap-southeast-2"
+  region = "ap-southeast-2"
 }
 
 module "s3backend" {
-    source      = "nicodewet/s3backend/aws"
-    version     = "0.6.0"
-    namespace   = "team-nico"
+  source    = "nicodewet/s3backend/aws"
+  version   = "0.6.0"
+  namespace = "team-nico"
 }
 
 output "s3backend_config" {
-    // config required to connect to the backend
-    value = module.s3backend.config
+  // config required to connect to the backend
+  value = module.s3backend.config
 }

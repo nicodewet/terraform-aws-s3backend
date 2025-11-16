@@ -1,5 +1,5 @@
 terraform {
-    /*
+  /*
     * backends are configured within Terraform settings
     *
     * If a configuration includes no backend block, Terraform defaults to using the 
@@ -7,7 +7,7 @@ terraform {
     *
     * https://developer.hashicorp.com/terraform/language/settings/backends/configuration
     * https://developer.hashicorp.com/terraform/language/settings/backends/s3
-    */ 
+    */
   backend "s3" {
     // from aws backend module output
     bucket = var.bucket
@@ -21,8 +21,8 @@ terraform {
     * It cannot be configured via a variable in an environment variable definition file as it is evaluated during
     * initialization. We have parameterised it during Terraform initialisation however using a command line flag
     * via -backend-config="region=$REGION"
-    */ 
-    region = var.region
+    */
+    region  = var.region
     encrypt = true
     // from aws backend module output
     role_arn = var.role_arn
@@ -32,15 +32,15 @@ terraform {
   required_version = ">= 0.15"
   required_providers {
     null = {
-        source = "hashicorp/null"
-        version = "~> 3.0"
+      source  = "hashicorp/null"
+      version = "~> 3.0"
     }
   }
 }
 
 variable "region" {
-    description = "AWS Region"
-    type = string
+  description = "AWS Region"
+  type        = string
 }
 
 provider "aws" {
@@ -48,19 +48,19 @@ provider "aws" {
 }
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
-    filter {
-        name = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-    }
-    owners = ["099720109477"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+  owners = ["099720109477"]
 }
 
 resource "aws_instance" "instance" {
-	ami = data.aws_ami.ubuntu.id
-	instance_type = "t2.micro"
-	tags = {
-        // A special variable like "path", containing only one attribute: "workspace"
-		Name = terraform.workspace
-	}
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  tags = {
+    // A special variable like "path", containing only one attribute: "workspace"
+    Name = terraform.workspace
+  }
 }
