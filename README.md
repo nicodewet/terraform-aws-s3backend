@@ -96,11 +96,10 @@ Resources have two tags:
 
 Now for the S3 Backend Configuration. 
 
-Note the **priincipal_arns** variable has not been specified because as per the S3 Backend Module's **iam.tf** it will default to the AWS
-caller identity's ARN, so your ARN, *which is good to start with*.
+Note the **principal_arns** variable has not been specified because as per the S3 Backend Module's **iam.tf** it will default to the AWS caller identity's ARN, so your ARN, *which is good to start with*.
 
 The ominoulsy named **force_destroy_state** variable hasn't been specified either as it only [applies when the bucket is destroyed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket#force_destroy).
-
+ 
 ```
 s3backend_module/exercises/s3backend_deploy  (git)-[main]- % cat s3backend.tf 
 
@@ -122,8 +121,7 @@ output "s3backend_config" {
 
 Now let's deploy so we can start using it. 
 
-I'm intentionally not using the *auto-approve* option along with the *apply* command as I feel it's important to pause
-and study the output, even when one is very familiar with what the module does. 
+I'm intentionally not using the *auto-approve* option along with the *apply* command as I feel it's important to pause and study the output, even when one is very familiar with what the module does. 
 
 ```
 s3backend_module/exercises/s3backend_deploy  (git)-[main]- % terraform init && terraform apply
@@ -131,7 +129,7 @@ s3backend_module/exercises/s3backend_deploy  (git)-[main]- % terraform init && t
 
 In terms of the output, here is an example with identifiers scrambled. 
 
-In the next step, namely s3backend_test, we'll abstracting sensitive ARNs and this means using placeholders 
+In the next step, namely s3backend_test, we'll manage sensitive ARNs and this means using placeholders 
 or environment variables instead of hardcoding them.
 
 ```
@@ -145,8 +143,7 @@ s3backend_config = {
 
 ### s3backend_test
 
-Firstly inspect test.tf and notice the variables in the s3 backend declaration section which we'll populate using environment variables 
-and command line flags.
+Firstly inspect test.tf and notice the variables in the s3 backend declaration section which we'll populate using environment variables and command line flags.
 
 The s3 backend configuration with the variable declerations follows.
 
@@ -183,8 +180,7 @@ s3backend_module/exercises/s3backend_test % terraform init \
 -backend-config="role_arn=$ROLE_ARN"
 ```
 
-So now let's get the [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) to do 
-run a command locally as a test, then run it again to convince yourself the null_resource will be replaced on each run.
+So now let's get the [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) to run a command locally as a test, then run it again to convince yourself the null_resource will be replaced on each run.
 
 ```
 s3backend_module/exercises/s3backend_test % terraform apply -auto-approve
@@ -215,8 +211,7 @@ null_resource.DI_FM_Radio: Creation complete after 0s [id=3461312214203961120]
 Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
 ```
 
-As a final check, navigate to the Resource Groups view on the AWS Console, your team's S3 backend should be easy to find. Then click on the S3
-component and notice the *team1* folder with *my-cool-project* state file.
+As a final check, navigate to the Resource Groups view on the AWS Console, your team's S3 backend should be easy to find. Then click on the S3 component and notice the *team1* folder with *my-cool-project* state file.
 
 A swifter way of figuring out what state exists is to run the *state list* command as follows.
 
@@ -225,8 +220,7 @@ s3backend_module/exercises/s3backend_test % terraform state list
 null_resource.DI_FM_Radio
 ```
 
-At this stage we've made good progress, but we'll want to use workspaces to be truly effective in a team environment. We'll move onto the next 
-section for that.
+At this stage we've made good progress, but we'll want to use workspaces to be truly effective in a team environment. We'll move onto the next section for that.
 
 ### s3backend_with_workspaces
 
@@ -234,15 +228,13 @@ section for that.
 
 Workspaces give you the ability to have more than one state file with the same configuration code.
 
-Each workspace has a variable definitions file to parameterize the environment. The net benefit is not having to copy and past configuration code
-on a per environment basis.
+Each workspace has a variable definitions file to parameterize the environment. The net benefit is not having to copy and paste configuration code on a per environment basis.
 
 ### Implementation
 
 The S3 backend initialization is as before in terms of feeding environment variables into the backend-config command line parameters.
 
-We want to avoid using the *default* workspace which is what you would be on after initialisaing Terraform without specifying a workspace. 
-We'll confirm this first and then dive into targeted workspace initialization.
+We want to avoid using the *default* workspace which is what you would be on after initialisaing Terraform without specifying a workspace. We'll confirm this first and then dive into targeted workspace initialization.
 
 #### The default workspace
 
@@ -296,14 +288,11 @@ the top level because we did not use environment workspaces in our *s3backend_te
 
 #### Cleanup
 
-Let's delete the EC2 instance from each environment and then also delete the entire S3 backend to competely clean up. Of course
-you won't do the latter in a team environment but this is an exercise.
+Let's delete the EC2 instance from each environment and then also delete the entire S3 backend to competely clean up. Of course you won't do the latter in a team environment but this is an exercise.
 
-Our configuration is still set at the prod environment so that will get destroyed first. We'll then switch to dev and then
-navigate to the s3backend_deploy directory to destroy the S3 backend.
+Our configuration is still set at the prod environment so that will get destroyed first. We'll then switch to dev and then navigate to the s3backend_deploy directory to destroy the S3 backend.
 
-If you forget to specify the region (by not including the -var-file=./environments/prod.tfvars) you'll be prompted for the 
-variable value.
+If you forget to specify the region (by not including the -var-file=./environments/prod.tfvars) you'll be prompted for the variable value.
 
 ```
 s3backend_module/exercises/s3backend_with_workspaces % terraform destroy -var-file=./environments/prod.tfvars -auto-approve
@@ -330,16 +319,13 @@ functional over time.
 
 In a generic sense, doing so offer the following benefits:
 
-- **Automated Testing**: Every time you or someone else makes changes to the module, you can automatically run 
-tests (e.g., terraform validate, terraform plan) to ensure no regressions or issues are introduced.
+- **Automated Testing**: Every time you or someone else makes changes to the module, you can automatically run tests (e.g., terraform validate, terraform plan) to ensure no regressions or issues are introduced.
 
-- **Versioning Control**: You can automate the process of version tagging and releasing new versions to the Terraform 
-registry, ensuring consistent version management.
+- **Versioning Control**: You can automate the process of version tagging and releasing new versions to the Terraform registry, ensuring consistent version management.
 
 - **Early Detection**: If dependencies or underlying services change, tests will catch those issues before they impact users.
 
-- **Confidence for Public Users**: As it's publicly available, external users will have more confidence in a module that is 
-rigorously tested and maintained.
+- **Confidence for Public Users**: As it's publicly available, external users will have more confidence in a module that is rigorously tested and maintained.
 
 ## Cloud infrastructure configuration checking
 
@@ -368,5 +354,6 @@ $ chmod +x ci/tf-checks.sh
 3. Run the script:
 
 ```bash
-$ 
+$ ./ci/tf-checks.sh 
+Terraform formatting OK 
 ```
