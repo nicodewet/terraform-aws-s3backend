@@ -60,6 +60,9 @@ jobs:
       # Step 6: Install TFLint
       - name: Install TFLint
         uses: terraform-linters/setup-tflint@v4
+        with:
+          # Pin to the latest known version so your CI is stable
+          tflint_version: v0.60.0
 
       # Step 7: Run TFLint (lint module code)
       - name: Run TFLint
