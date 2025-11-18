@@ -1,5 +1,8 @@
 # Production-ready S3 Backend Module
 
+[![Terraform Checks](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml)
+
+
 ## Context - Why?
 
 So often this kind of material is done for you, as a professional software engineer, with pre-established *guardrails* as the reasoning, or various pigeon holing titles.
