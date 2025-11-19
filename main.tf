@@ -84,7 +84,7 @@ resource "aws_kms_key" "kms_key" {
     // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
     // The following tag is required from an AWS Console user-friendliness perspective.
-    Name = "${local.resource_aws_console_tag_name}"
+    Name = local.resource_aws_console_tag_name
   }
 }
 
@@ -104,7 +104,7 @@ resource "aws_s3_bucket" "s3_bucket" {
     // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
     // The following tag is required from an AWS Console user-friendliness perspective.
-    Name = "${local.resource_aws_console_tag_name}"
+    Name = local.resource_aws_console_tag_name
   }
 }
 
@@ -153,6 +153,6 @@ resource "aws_dynamodb_table" "dynamodb_table" {
     // The following tag is required as per our AWS Resource Groups tag-based TagFilter query filter specification.
     ResourceGroup = local.namespace
     // The following tag is required from an AWS Console user-friendliness perspective.
-    Name = "${local.resource_aws_console_tag_name}"
+    Name = local.resource_aws_console_tag_name
   }
 }

@@ -31,6 +31,43 @@ jobs:
       - name: Make tf-checks.sh executable
         run: chmod +x ci/tf-checks.sh
 
-      # Step 5: Run the script
+      # Step 5: Run basic Terraform checks (fmt + init -backend=false + validate)
+      # This runs our tf-checks.sh script, which performs the core Terraform
+      # validation steps for a *reusable module*.
+      #
+      # The script does three things:
+      #
+      # 1) `terraform fmt -check -recursive`
+      #      - Ensures all Terraform files are formatted correctly.
+      #      - CI fails if formatting is incorrect.
+      #      - Developers fix locally using: `terraform fmt -recursive`.
+      #
+      # 2) `terraform init -backend=false`
+      #      - Initializes Terraform *without* touching any backend.
+      #      - Required because this is a MODULE, not a root deployment.
+      #      - Downloads providers and prepares the config for validation.
+      #
+      # 3) `terraform validate`
+      #      - Ensures Terraform configuration is syntactically valid.
+      #      - Validates variable definitions and module structure.
+      #      - Does NOT read or require state (perfect for modules).
+      #
+      # If any of these steps fail, the workflow exits with a non-zero code
+      # and the PR/push will be blocked.
       - name: Run Terraform checks
         run: ./ci/tf-checks.sh
+
+      # Step 6: Install TFLint
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          # Pin to the latest known version so your CI is stable
+          tflint_version: v0.60.0
+
+      # Step 7: Initialise TFLint plugins (e.g. AWS ruleset)
+      - name: Initialise TFLint plugins
+        run: tflint --init
+
+      # Step 8: Run TFLint (with AWS ruleset enabled)
+      - name: Run TFLint
+        run: tflint
