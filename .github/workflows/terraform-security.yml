@@ -36,6 +36,7 @@ jobs:
           directory: .
           framework: terraform
           skip_path: exercises/
+          hard_fail_on: 'HIGH' # Fail the build if any High or Critical severity issues are found
           # soft_fail=false means: fail the job if Checkov finds issues.
           # Set to true temporarily if you want to see findings without failing CI.
           soft_fail: false
