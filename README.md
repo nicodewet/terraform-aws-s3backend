@@ -5,7 +5,7 @@
 
 ## Context - Why?
 
-So often this kind of material is done for you, as a professional software engineer, with pre-established *guardrails* as the reasoning, or various pigeon holing titles.
+So often this kind of material is done for you, as a professional software engineer, with pre-established *guardrails* as the reasoning.
 
 That makes sense. Unless you want to learn about something and master it, so let's go.
 
@@ -71,7 +71,8 @@ The following diagram shows the four distinct components that make up the S3 Bac
 
 ![S3 backend variables](readme_pics/s3_backend_module_components.png)
 
-Because there is no dependency relationship between the modules, and so no resource hierarchy, and also because we have a small-to-medium sized cobebase a *flat module* can be used to organize the Terraform code. The advantage of the flat module,
+Because there is no dependency relationship between the modules, and so no resource hierarchy, and also because we have a 
+small-to-medium sized cobebase a *flat module* can be used to organize the Terraform code. The advantage of the flat module,
 rather than nested modules, is not needing to link modules together.
 
 ## S3 Backend Module is a Flat Module
