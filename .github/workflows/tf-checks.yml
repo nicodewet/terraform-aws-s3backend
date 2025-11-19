@@ -64,6 +64,10 @@ jobs:
           # Pin to the latest known version so your CI is stable
           tflint_version: v0.60.0
 
-      # Step 7: Run TFLint (lint module code)
+      # Step 7: Initialise TFLint plugins (e.g. AWS ruleset)
+      - name: Initialise TFLint plugins
+        run: tflint --init
+
+      # Step 8: Run TFLint (with AWS ruleset enabled)
       - name: Run TFLint
         run: tflint
