@@ -35,7 +35,7 @@ jobs:
         with:
           directory: .
           framework: terraform
-          skip-path: exercises/
+          skip_path: exercises/
           # soft_fail=false means: fail the job if Checkov finds issues.
           # Set to true temporarily if you want to see findings without failing CI.
           soft_fail: false
