@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: ["*"]
 
+permissions: read-all # Applies to all jobs in the workflow
+
 jobs:
   tf-checks:
     name: Run Terraform Checks

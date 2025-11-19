@@ -1,0 +1,40 @@
+name: Terraform Security Scans
+
+on:
+  # Trigger this workflow only after "Terraform Checks" has completed
+  workflow_run:
+    workflows: ["Terraform Checks"]
+    types:
+      - completed
+
+permissions: read-all # Applies to all jobs in the workflow
+      
+jobs:
+  checkov:
+    # Only run security scans if Terraform Checks succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the same commit that triggered Terraform Checks
+      # This ensures we scan the exact code that just passed fmt/validate/TFLint.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # head_sha is the commit that triggered the workflow_run
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      # Step 2: Run Checkov Terraform security scanning
+      # - Scans all Terraform files under the repo
+      # - Uses built-in policies for things like:
+      #   * S3 encryption, public access, logging
+      #   * IAM wildcards and privilege issues
+      #   * General cloud misconfigurations
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
+          # soft_fail=false means: fail the job if Checkov finds issues.
+          # Set to true temporarily if you want to see findings without failing CI.
+          soft_fail: false
