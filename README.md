@@ -1,6 +1,7 @@
 # Production-ready S3 Backend Module
 
-[![Terraform Checks](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml)
+[![Terraform Checks](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml) [![Terraform Security Scans](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml)
+
 
 
 ## Context - Why?
