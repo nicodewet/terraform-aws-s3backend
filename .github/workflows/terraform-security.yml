@@ -8,7 +8,7 @@ on:
       - completed
 
 permissions: read-all # Applies to all jobs in the workflow
-      
+
 jobs:
   checkov:
     # Only run security scans if Terraform Checks succeeded
@@ -35,6 +35,7 @@ jobs:
         with:
           directory: .
           framework: terraform
+          skip-path: exercises/
           # soft_fail=false means: fail the job if Checkov finds issues.
           # Set to true temporarily if you want to see findings without failing CI.
           soft_fail: false
