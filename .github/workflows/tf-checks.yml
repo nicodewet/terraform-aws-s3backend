@@ -20,9 +20,9 @@ jobs:
 
       # Step 2: Setup Terraform (exact version)
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
-          terraform_version: 1.13.5
+          terraform_version: 1.14.5
 
       # Step 3: Test Terraform installation
       # This prints the Terraform version so we can debug any EPIPE issues
@@ -61,10 +61,10 @@ jobs:
 
       # Step 6: Install TFLint
       - name: Install TFLint
-        uses: terraform-linters/setup-tflint@v4
+        uses: terraform-linters/setup-tflint@v6.2.1
         with:
           # Pin to the latest known version so your CI is stable
-          tflint_version: v0.60.0
+          tflint_version: v0.61.0
 
       # Step 7: Initialise TFLint plugins (e.g. AWS ruleset)
       - name: Initialise TFLint plugins
