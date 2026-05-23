@@ -8,21 +8,31 @@ phases assume earlier ones are green.
 ## Phase 0 — Decide the CI substrate
 
 **Goal.** Pick LocalStack vs a disposable AWS account for end-to-end CI,
-and write the decision down so we don't re-litigate it.
+record the decision, and prove the chosen substrate end-to-end with a
+minimal proof-of-concept.
 
-- Spike: stand up the module against LocalStack; record what fails or
-  diverges (KMS grants, IAM assume-role, DynamoDB locking semantics).
-- Spike: confirm the disposable AWS Organizations account can be reached
-  from GitHub Actions (auth method TBD in Phase 1).
-- Decision recorded in `specs/decisions/` (new file, ADR-style) or as an
-  update to `tech-stack.md` §Gaps.
+Detailed plan and rationale live in
+`specs/2026-05-23-phase-0-decide-ci-substrate/`. The going-in decision
+is **disposable AWS account** (fidelity-led — KMS grants, IAM
+assume-role, DynamoDB conditional writes, and `force_destroy` semantics
+are the things LocalStack imitates imperfectly and the things this
+module exercises hardest).
 
-**Done when.** A written decision exists and the rest of this roadmap is
-re-read in light of it.
+- Reason through the choice and record it in [[tech-stack]] §Gaps in
+  place (no `specs/decisions/` directory — explicitly rejected).
+- Build a minimal bash PoC that `apply`s `exercises/s3backend_deploy`,
+  `apply`s `exercises/s3backend_test` against it, asserts resources
+  exist, then `destroy`s in reverse order. Cleanup is mandatory.
+- Run the PoC end-to-end against the disposable AWS account. Capture
+  the log in the feature dir. Post-cleanup leak check must report zero
+  module-tagged resources.
+
+**Done when.** The decision is recorded in `tech-stack.md`, the PoC
+script lives in `ci/`, it has run cleanly at least once against the
+disposable account, and `roadmap.md` has been re-read in light of the
+decision.
 
 ## Phase 1 — Secure GitHub Actions ↔ AWS integration
-
-*Only if Phase 0 picks real AWS. If LocalStack wins, skip to Phase 2.*
 
 **Goal.** Keyless, repo-scoped access to the CI AWS account.
 
@@ -42,7 +52,7 @@ long-lived secrets in the repo.
 
 - Choose the harness (Terratest, native `terraform test`, or shell) and
   document why.
-- GIVEN: a clean account/LocalStack.
+- GIVEN: a clean disposable AWS account.
 - WHEN: `terraform apply` on `exercises/s3backend_deploy`, then
   `terraform apply` on `exercises/s3backend_test` using the backend
   outputs.
@@ -71,7 +81,7 @@ manual intervention.
 - Add the Phase 2/3 workflow status badge to README, alongside the
   existing fmt/validate and Checkov badges.
 - Short README paragraph explaining what the badge actually proves
-  (apply + assertions + destroy against real AWS or LocalStack).
+  (apply + assertions + destroy against the disposable AWS account).
 
 **Done when.** The badge is live in README and links to the latest run.
 
