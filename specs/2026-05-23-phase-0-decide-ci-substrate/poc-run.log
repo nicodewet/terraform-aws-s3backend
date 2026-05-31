@@ -1,0 +1,848 @@
+
+=== PREFLIGHT ===
+materialised short-lived env credentials from the SSO profile
+caller: arn:aws:sts::<ACCOUNT_ID>:assumed-role/AWSReservedSSO_AdministratorAccess_<SSO_SUFFIX>/nicodewet
+
+=== STEP A — deploy backend (module source = ../../../) ===
+[0m[1mInitializing modules...[0m
+[0m[1mInitializing provider plugins found in the configuration...[0m
+- Reusing previous version of hashicorp/random from the dependency lock file
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/random v3.6.3
+- Using previously-installed hashicorp/aws v5.64.0
+
+[0m[1mInitializing the backend...[0m
+
+
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[0m[1mmodule.s3backend.data.aws_region.current: Reading...[0m[0m
+[0m[1mmodule.s3backend.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.s3backend.data.aws_region.current: Read complete after 0s [id=ap-southeast-2][0m
+[0m[1mmodule.s3backend.data.aws_caller_identity.current: Read complete after 0s [id=<ACCOUNT_ID>][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+ [36m<=[0m read (data resources)[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.s3backend.data.aws_iam_policy_document.policy_doc[0m will be read during apply
+  # (config refers to values not yet known)
+[0m [36m<=[0m[0m data "aws_iam_policy_document" "policy_doc" {
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m json          = (known after apply)
+      [32m+[0m[0m minified_json = (known after apply)
+
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "s3:ListBucket",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+            ]
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "s3:DeleteObject",
+              [32m+[0m[0m "s3:GetObject",
+              [32m+[0m[0m "s3:PutObject",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+            ]
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "dynamodb:DeleteItem",
+              [32m+[0m[0m "dynamodb:GetItem",
+              [32m+[0m[0m "dynamodb:PutItem",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+            ]
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "kms:Decrypt",
+              [32m+[0m[0m "kms:DescribeKey",
+              [32m+[0m[0m "kms:GenerateDataKey",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+            ]
+        }
+    }
+
+[1m  # module.s3backend.aws_dynamodb_table.dynamodb_table[0m will be created
+[0m  [32m+[0m[0m resource "aws_dynamodb_table" "dynamodb_table" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m billing_mode     = "PAY_PER_REQUEST"
+      [32m+[0m[0m hash_key         = "LockID"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m read_capacity    = (known after apply)
+      [32m+[0m[0m stream_arn       = (known after apply)
+      [32m+[0m[0m stream_label     = (known after apply)
+      [32m+[0m[0m stream_view_type = (known after apply)
+      [32m+[0m[0m tags             = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+      [32m+[0m[0m write_capacity   = (known after apply)
+
+      [32m+[0m[0m attribute {
+          [32m+[0m[0m name = "LockID"
+          [32m+[0m[0m type = "S"
+        }
+
+      [32m+[0m[0m point_in_time_recovery (known after apply)
+
+      [32m+[0m[0m server_side_encryption (known after apply)
+
+      [32m+[0m[0m ttl (known after apply)
+    }
+
+[1m  # module.s3backend.aws_iam_policy.iam_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "iam_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
+    }
+
+[1m  # module.s3backend.aws_iam_role.iam_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "iam_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m AWS = [
+                              [32m+[0m[0m "arn:aws:sts::<ACCOUNT_ID>:assumed-role/AWSReservedSSO_AdministratorAccess_<SSO_SUFFIX>/nicodewet",
+                            ]
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = (known after apply)
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = (known after apply)
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.s3backend.aws_iam_role_policy_attachment.policy_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "policy_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = (known after apply)
+    }
+
+[1m  # module.s3backend.aws_kms_key.kms_key[0m will be created
+[0m  [32m+[0m[0m resource "aws_kms_key" "kms_key" {
+      [32m+[0m[0m arn                                = (known after apply)
+      [32m+[0m[0m bypass_policy_lockout_safety_check = false
+      [32m+[0m[0m customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      [32m+[0m[0m description                        = "Used to encrypts S3 Backend Module S3 state at rest"
+      [32m+[0m[0m enable_key_rotation                = false
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m is_enabled                         = true
+      [32m+[0m[0m key_id                             = (known after apply)
+      [32m+[0m[0m key_usage                          = "ENCRYPT_DECRYPT"
+      [32m+[0m[0m multi_region                       = (known after apply)
+      [32m+[0m[0m policy                             = (known after apply)
+      [32m+[0m[0m rotation_period_in_days            = (known after apply)
+      [32m+[0m[0m tags                               = (known after apply)
+      [32m+[0m[0m tags_all                           = (known after apply)
+    }
+
+[1m  # module.s3backend.aws_resourcegroups_group.resourcegroups_group[0m will be created
+[0m  [32m+[0m[0m resource "aws_resourcegroups_group" "resourcegroups_group" {
+      [32m+[0m[0m arn      = (known after apply)
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m name     = (known after apply)
+      [32m+[0m[0m tags_all = (known after apply)
+
+      [32m+[0m[0m resource_query {
+          [32m+[0m[0m query = (known after apply)
+          [32m+[0m[0m type  = "TAG_FILTERS_1_0"
+        }
+    }
+
+[1m  # module.s3backend.aws_s3_bucket.s3_bucket[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "s3_bucket" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = (known after apply)
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = (known after apply)
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags                        = (known after apply)
+      [32m+[0m[0m tags_all                    = (known after apply)
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
+
+      [32m+[0m[0m cors_rule (known after apply)
+
+      [32m+[0m[0m grant (known after apply)
+
+      [32m+[0m[0m lifecycle_rule (known after apply)
+
+      [32m+[0m[0m logging (known after apply)
+
+      [32m+[0m[0m object_lock_configuration (known after apply)
+
+      [32m+[0m[0m replication_configuration (known after apply)
+
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
+
+      [32m+[0m[0m versioning (known after apply)
+
+      [32m+[0m[0m website (known after apply)
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "s3_bucket_access_config" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m restrict_public_buckets = true
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+
+      [32m+[0m[0m rule {
+          [32m+[0m[0m apply_server_side_encryption_by_default {
+              [32m+[0m[0m kms_master_key_id = (known after apply)
+              [32m+[0m[0m sse_algorithm     = "aws:kms"
+            }
+        }
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_versioning.s3_versioning[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_versioning" "s3_versioning" {
+      [32m+[0m[0m bucket = (known after apply)
+      [32m+[0m[0m id     = (known after apply)
+
+      [32m+[0m[0m versioning_configuration {
+          [32m+[0m[0m mfa_delete = (known after apply)
+          [32m+[0m[0m status     = "Enabled"
+        }
+    }
+
+[1m  # module.s3backend.random_string.rand[0m will be created
+[0m  [32m+[0m[0m resource "random_string" "rand" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m length      = 24
+      [32m+[0m[0m lower       = true
+      [32m+[0m[0m min_lower   = 0
+      [32m+[0m[0m min_numeric = 0
+      [32m+[0m[0m min_special = 0
+      [32m+[0m[0m min_upper   = 0
+      [32m+[0m[0m number      = true
+      [32m+[0m[0m numeric     = true
+      [32m+[0m[0m result      = (known after apply)
+      [32m+[0m[0m special     = false
+      [32m+[0m[0m upper       = false
+    }
+
+[1mPlan:[0m [0m11 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m s3backend_config = {
+      [32m+[0m[0m bucket         = (known after apply)
+      [32m+[0m[0m dynamodb_table = (known after apply)
+      [32m+[0m[0m region         = "ap-southeast-2"
+      [32m+[0m[0m role_arn       = (known after apply)
+    }
+[0m[1mmodule.s3backend.random_string.rand: Creating...[0m[0m
+[0m[1mmodule.s3backend.random_string.rand: Creation complete after 1s [id=ultbe8cegdiumjnbcbb2agq6][0m
+[0m[1mmodule.s3backend.aws_iam_role.iam_role: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_kms_key.kms_key: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket.s3_bucket: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_resourcegroups_group.resourcegroups_group: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_dynamodb_table.dynamodb_table: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_resourcegroups_group.resourcegroups_group: Creation complete after 1s [id=poc-ci-ultbe8cegdiumjnbc-terraform-group][0m
+[0m[1mmodule.s3backend.aws_iam_role.iam_role: Creation complete after 2s [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role][0m
+[0m[1mmodule.s3backend.aws_s3_bucket.s3_bucket: Creation complete after 3s [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_versioning.s3_versioning: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config: Creation complete after 0s [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_versioning.s3_versioning: Creation complete after 1s [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_kms_key.kms_key: Creation complete after 5s [id=db905ba7-04d9-4467-9bd6-d9f69c645db4][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption: Creation complete after 0s [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_dynamodb_table.dynamodb_table: Creation complete after 7s [id=poc-ci-ultbe8cegdiumjnbc-state-lock][0m
+[0m[1mmodule.s3backend.data.aws_iam_policy_document.policy_doc: Reading...[0m[0m
+[0m[1mmodule.s3backend.data.aws_iam_policy_document.policy_doc: Read complete after 0s [id=3626768895][0m
+[0m[1mmodule.s3backend.aws_iam_policy.iam_policy: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_iam_policy.iam_policy: Creation complete after 1s [id=arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy][0m
+[0m[1mmodule.s3backend.aws_iam_role_policy_attachment.policy_attach: Creating...[0m[0m
+[0m[1mmodule.s3backend.aws_iam_role_policy_attachment.policy_attach: Creation complete after 1s [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role-20260531204730407900000001][0m
+[0m[1m[32m
+Apply complete! Resources: 11 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0ms3backend_config = {
+  "bucket" = "poc-ci-ultbe8cegdiumjnbc-state-bucket"
+  "dynamodb_table" = "poc-ci-ultbe8cegdiumjnbc-state-lock"
+  "region" = "ap-southeast-2"
+  "role_arn" = "arn:aws:iam::<ACCOUNT_ID>:role/poc-ci-ultbe8cegdiumjnbc-tf-assume-role"
+}
+bucket=poc-ci-ultbe8cegdiumjnbc-state-bucket
+table=poc-ci-ultbe8cegdiumjnbc-state-lock  region=ap-southeast-2
+role=arn:aws:iam::<ACCOUNT_ID>:role/poc-ci-ultbe8cegdiumjnbc-tf-assume-role
+namespace(tag)=poc-ci-ultbe8cegdiumjnbc
+
+=== STEP B — init + apply the test config against the new backend ===
+[0m[1mInitializing provider plugins found in the configuration...[0m
+- Reusing previous version of hashicorp/null from the dependency lock file
+- Using previously-installed hashicorp/null v3.3.0
+
+[0m[1mInitializing the backend...[0m
+[0m[32m
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.[0m
+
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mDeprecated Parameter[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  on main.tf line 11, in terraform:
+[33m│[0m [0m  11:   backend "s3" [4m{[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mThe parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+[33m│[0m [0minstead.
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mError refreshing state: Unable to access object "team1/my-cool-project" in S3 bucket "poc-ci-ultbe8cegdiumjnbc-state-bucket": operation error S3: HeadObject, https response error StatusCode: 403, RequestID: CG7NRQE22W0Y56H9, HostID: k8Oy87W56UrlKZTu9mY3x15RGQByqnBCUUXYCrzF1NIxcjuqCVA/BJZZiJor1cr1ZQkEe98b3srFyS8z0g4eWSwKcGpyzlu+, api error Forbidden: Forbidden[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m
+[31m╵[0m[0m
+init attempt 1 failed — IAM likely still propagating; retrying in 5s
+[0m[1mInitializing provider plugins found in the configuration...[0m
+- Reusing previous version of hashicorp/null from the dependency lock file
+- Using previously-installed hashicorp/null v3.3.0
+
+[0m[1mInitializing the backend...[0m
+[0m[32m
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.[0m
+
+
+
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mDeprecated Parameter[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  on main.tf line 11, in terraform:
+[33m│[0m [0m  11:   backend "s3" [4m{[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mThe parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+[33m│[0m [0minstead.
+[33m╵[0m[0m
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mDeprecated Parameter[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+[33m│[0m [0minstead.
+[33m╵[0m[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # null_resource.state_marker[0m will be created
+[0m  [32m+[0m[0m resource "null_resource" "state_marker" {
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m triggers = {
+          [32m+[0m[0m "always" = (known after apply)
+        }
+    }
+
+[1mPlan:[0m [0m1 to add, 0 to change, 0 to destroy.
+[0m[1mnull_resource.state_marker: Creating...[0m[0m
+[0m[1mnull_resource.state_marker: Provisioning with 'local-exec'...[0m[0m
+[0m[1mnull_resource.state_marker (local-exec):[0m [0mExecuting: ["/bin/sh" "-c" "echo 'poc: terraform state written to the s3 backend'"]
+[0m[1mnull_resource.state_marker (local-exec):[0m [0mpoc: terraform state written to the s3 backend
+[0m[1mnull_resource.state_marker: Creation complete after 0s [id=2798775957014319751][0m
+[0m[1m[32m
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
+
+=== ASSERTIONS ===
+{
+    "BucketRegion": "ap-southeast-2",
+    "AccessPointAlias": false
+}
+OK 1/3 — state bucket exists: poc-ci-ultbe8cegdiumjnbc-state-bucket
+OK 2/3 — lock table exists: poc-ci-ultbe8cegdiumjnbc-state-lock
+OK 3/3 — state object written under team1/my-cool-project
+
+=== ALL ASSERTIONS PASSED — teardown + leak check run next via the EXIT trap ===
+
+=== CLEANUP (triggering exit code: 0) ===
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mDeprecated Parameter[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+[33m│[0m [0minstead.
+[33m╵[0m[0m
+[0m[1mnull_resource.state_marker: Refreshing state... [id=2798775957014319751][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # null_resource.state_marker[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "null_resource" "state_marker" {
+      [31m-[0m[0m id       = "2798775957014319751" [90m-> null[0m[0m
+      [31m-[0m[0m triggers = {
+          [31m-[0m[0m "always" = "2026-05-31T20:47:46Z"
+        } [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 1 to destroy.
+[0m[1mnull_resource.state_marker: Destroying... [id=2798775957014319751][0m[0m
+[0m[1mnull_resource.state_marker: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 1 destroyed.[0m
+[0m[1mmodule.s3backend.random_string.rand: Refreshing state... [id=ultbe8cegdiumjnbcbb2agq6][0m
+[0m[1mmodule.s3backend.aws_kms_key.kms_key: Refreshing state... [id=db905ba7-04d9-4467-9bd6-d9f69c645db4][0m
+[0m[1mmodule.s3backend.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.s3backend.data.aws_region.current: Reading...[0m[0m
+[0m[1mmodule.s3backend.aws_resourcegroups_group.resourcegroups_group: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-terraform-group][0m
+[0m[1mmodule.s3backend.aws_s3_bucket.s3_bucket: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_dynamodb_table.dynamodb_table: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-state-lock][0m
+[0m[1mmodule.s3backend.data.aws_region.current: Read complete after 0s [id=ap-southeast-2][0m
+[0m[1mmodule.s3backend.data.aws_caller_identity.current: Read complete after 0s [id=<ACCOUNT_ID>][0m
+[0m[1mmodule.s3backend.aws_iam_role.iam_role: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.aws_s3_bucket_versioning.s3_versioning: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m
+[0m[1mmodule.s3backend.data.aws_iam_policy_document.policy_doc: Reading...[0m[0m
+[0m[1mmodule.s3backend.data.aws_iam_policy_document.policy_doc: Read complete after 0s [id=3626768895][0m
+[0m[1mmodule.s3backend.aws_iam_policy.iam_policy: Refreshing state... [id=arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy][0m
+[0m[1mmodule.s3backend.aws_iam_role_policy_attachment.policy_attach: Refreshing state... [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role-20260531204730407900000001][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.s3backend.aws_dynamodb_table.dynamodb_table[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_dynamodb_table" "dynamodb_table" {
+      [31m-[0m[0m arn                         = "arn:aws:dynamodb:ap-southeast-2:<ACCOUNT_ID>:table/poc-ci-ultbe8cegdiumjnbc-state-lock" [90m-> null[0m[0m
+      [31m-[0m[0m billing_mode                = "PAY_PER_REQUEST" [90m-> null[0m[0m
+      [31m-[0m[0m deletion_protection_enabled = false [90m-> null[0m[0m
+      [31m-[0m[0m hash_key                    = "LockID" [90m-> null[0m[0m
+      [31m-[0m[0m id                          = "poc-ci-ultbe8cegdiumjnbc-state-lock" [90m-> null[0m[0m
+      [31m-[0m[0m name                        = "poc-ci-ultbe8cegdiumjnbc-state-lock" [90m-> null[0m[0m
+      [31m-[0m[0m read_capacity               = 0 [90m-> null[0m[0m
+      [31m-[0m[0m stream_enabled              = false [90m-> null[0m[0m
+      [31m-[0m[0m table_class                 = "STANDARD" [90m-> null[0m[0m
+      [31m-[0m[0m tags                        = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                    = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m write_capacity              = 0 [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m attribute {
+          [31m-[0m[0m name = "LockID" [90m-> null[0m[0m
+          [31m-[0m[0m type = "S" [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m point_in_time_recovery {
+          [31m-[0m[0m enabled = false [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m ttl {
+          [31m-[0m[0m enabled        = false [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+    }
+
+[1m  # module.s3backend.aws_iam_policy.iam_policy[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_policy" "iam_policy" {
+      [31m-[0m[0m arn              = "arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy" [90m-> null[0m[0m
+      [31m-[0m[0m attachment_count = 1 [90m-> null[0m[0m
+      [31m-[0m[0m id               = "arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy" [90m-> null[0m[0m
+      [31m-[0m[0m name             = "poc-ci-ultbe8cegdiumjnbc-tf-policy" [90m-> null[0m[0m
+      [31m-[0m[0m path             = "/" [90m-> null[0m[0m
+      [31m-[0m[0m policy           = jsonencode(
+            {
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action   = "s3:ListBucket"
+                      [31m-[0m[0m Effect   = "Allow"
+                      [31m-[0m[0m Resource = "arn:aws:s3:::poc-ci-ultbe8cegdiumjnbc-state-bucket"
+                    },
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action   = [
+                          [31m-[0m[0m "s3:PutObject",
+                          [31m-[0m[0m "s3:GetObject",
+                          [31m-[0m[0m "s3:DeleteObject",
+                        ]
+                      [31m-[0m[0m Effect   = "Allow"
+                      [31m-[0m[0m Resource = "arn:aws:s3:::poc-ci-ultbe8cegdiumjnbc-state-bucket/*"
+                    },
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action   = [
+                          [31m-[0m[0m "dynamodb:PutItem",
+                          [31m-[0m[0m "dynamodb:GetItem",
+                          [31m-[0m[0m "dynamodb:DeleteItem",
+                        ]
+                      [31m-[0m[0m Effect   = "Allow"
+                      [31m-[0m[0m Resource = "arn:aws:dynamodb:ap-southeast-2:<ACCOUNT_ID>:table/poc-ci-ultbe8cegdiumjnbc-state-lock"
+                    },
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action   = [
+                          [31m-[0m[0m "kms:GenerateDataKey",
+                          [31m-[0m[0m "kms:DescribeKey",
+                          [31m-[0m[0m "kms:Decrypt",
+                        ]
+                      [31m-[0m[0m Effect   = "Allow"
+                      [31m-[0m[0m Resource = "arn:aws:kms:ap-southeast-2:<ACCOUNT_ID>:key/db905ba7-04d9-4467-9bd6-d9f69c645db4"
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m policy_id        = "ANPAZ5G5TD4SHXMCGDGJK" [90m-> null[0m[0m
+      [31m-[0m[0m tags             = {} [90m-> null[0m[0m
+      [31m-[0m[0m tags_all         = {} [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.s3backend.aws_iam_role.iam_role[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role" "iam_role" {
+      [31m-[0m[0m arn                   = "arn:aws:iam::<ACCOUNT_ID>:role/poc-ci-ultbe8cegdiumjnbc-tf-assume-role" [90m-> null[0m[0m
+      [31m-[0m[0m assume_role_policy    = jsonencode(
+            {
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action    = "sts:AssumeRole"
+                      [31m-[0m[0m Effect    = "Allow"
+                      [31m-[0m[0m Principal = {
+                          [31m-[0m[0m AWS = [
+                              [31m-[0m[0m "arn:aws:sts::<ACCOUNT_ID>:assumed-role/AWSReservedSSO_AdministratorAccess_<SSO_SUFFIX>/nicodewet",
+                            ]
+                        }
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m create_date           = "2026-05-31T20:47:22Z" [90m-> null[0m[0m
+      [31m-[0m[0m force_detach_policies = false [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "poc-ci-ultbe8cegdiumjnbc-tf-assume-role" [90m-> null[0m[0m
+      [31m-[0m[0m managed_policy_arns   = [
+          [31m-[0m[0m "arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m max_session_duration  = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m name                  = "poc-ci-ultbe8cegdiumjnbc-tf-assume-role" [90m-> null[0m[0m
+      [31m-[0m[0m path                  = "/" [90m-> null[0m[0m
+      [31m-[0m[0m tags                  = {
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all              = {
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m unique_id             = "AROAZ5G5TD4SO5V75EMD6" [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.s3backend.aws_iam_role_policy_attachment.policy_attach[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "policy_attach" {
+      [31m-[0m[0m id         = "poc-ci-ultbe8cegdiumjnbc-tf-assume-role-20260531204730407900000001" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "poc-ci-ultbe8cegdiumjnbc-tf-assume-role" [90m-> null[0m[0m
+    }
+
+[1m  # module.s3backend.aws_kms_key.kms_key[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_kms_key" "kms_key" {
+      [31m-[0m[0m arn                                = "arn:aws:kms:ap-southeast-2:<ACCOUNT_ID>:key/db905ba7-04d9-4467-9bd6-d9f69c645db4" [90m-> null[0m[0m
+      [31m-[0m[0m bypass_policy_lockout_safety_check = false [90m-> null[0m[0m
+      [31m-[0m[0m customer_master_key_spec           = "SYMMETRIC_DEFAULT" [90m-> null[0m[0m
+      [31m-[0m[0m description                        = "Used to encrypts S3 Backend Module S3 state at rest" [90m-> null[0m[0m
+      [31m-[0m[0m enable_key_rotation                = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                 = "db905ba7-04d9-4467-9bd6-d9f69c645db4" [90m-> null[0m[0m
+      [31m-[0m[0m is_enabled                         = true [90m-> null[0m[0m
+      [31m-[0m[0m key_id                             = "db905ba7-04d9-4467-9bd6-d9f69c645db4" [90m-> null[0m[0m
+      [31m-[0m[0m key_usage                          = "ENCRYPT_DECRYPT" [90m-> null[0m[0m
+      [31m-[0m[0m multi_region                       = false [90m-> null[0m[0m
+      [31m-[0m[0m policy                             = jsonencode(
+            {
+              [31m-[0m[0m Id        = "key-default-1"
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action    = "kms:*"
+                      [31m-[0m[0m Effect    = "Allow"
+                      [31m-[0m[0m Principal = {
+                          [31m-[0m[0m AWS = "arn:aws:iam::<ACCOUNT_ID>:root"
+                        }
+                      [31m-[0m[0m Resource  = "*"
+                      [31m-[0m[0m Sid       = "Enable IAM User Permissions"
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m rotation_period_in_days            = 0 [90m-> null[0m[0m
+      [31m-[0m[0m tags                               = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                           = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.s3backend.aws_resourcegroups_group.resourcegroups_group[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_resourcegroups_group" "resourcegroups_group" {
+      [31m-[0m[0m arn         = "arn:aws:resource-groups:ap-southeast-2:<ACCOUNT_ID>:group/poc-ci-ultbe8cegdiumjnbc-terraform-group" [90m-> null[0m[0m
+      [31m-[0m[0m id          = "poc-ci-ultbe8cegdiumjnbc-terraform-group" [90m-> null[0m[0m
+      [31m-[0m[0m name        = "poc-ci-ultbe8cegdiumjnbc-terraform-group" [90m-> null[0m[0m
+      [31m-[0m[0m tags        = {} [90m-> null[0m[0m
+      [31m-[0m[0m tags_all    = {} [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+
+      [31m-[0m[0m resource_query {
+          [31m-[0m[0m query = jsonencode(
+                {
+                  [31m-[0m[0m ResourceTypeFilters = [
+                      [31m-[0m[0m "AWS::AllSupported",
+                    ]
+                  [31m-[0m[0m TagFilters          = [
+                      [31m-[0m[0m {
+                          [31m-[0m[0m Key    = "ResourceGroup"
+                          [31m-[0m[0m Values = [
+                              [31m-[0m[0m "poc-ci-ultbe8cegdiumjnbc",
+                            ]
+                        },
+                    ]
+                }
+            ) [90m-> null[0m[0m
+          [31m-[0m[0m type  = "TAG_FILTERS_1_0" [90m-> null[0m[0m
+        }
+    }
+
+[1m  # module.s3backend.aws_s3_bucket.s3_bucket[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_s3_bucket" "s3_bucket" {
+      [31m-[0m[0m arn                         = "arn:aws:s3:::poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m bucket                      = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m bucket_domain_name          = "poc-ci-ultbe8cegdiumjnbc-state-bucket.s3.amazonaws.com" [90m-> null[0m[0m
+      [31m-[0m[0m bucket_regional_domain_name = "poc-ci-ultbe8cegdiumjnbc-state-bucket.s3.ap-southeast-2.amazonaws.com" [90m-> null[0m[0m
+      [31m-[0m[0m force_destroy               = true [90m-> null[0m[0m
+      [31m-[0m[0m hosted_zone_id              = "Z1WCIGYICN2BYD" [90m-> null[0m[0m
+      [31m-[0m[0m id                          = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m object_lock_enabled         = false [90m-> null[0m[0m
+      [31m-[0m[0m region                      = "ap-southeast-2" [90m-> null[0m[0m
+      [31m-[0m[0m request_payer               = "BucketOwner" [90m-> null[0m[0m
+      [31m-[0m[0m tags                        = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                    = {
+          [31m-[0m[0m "Name"          = "terraform-s3backend-component"
+          [31m-[0m[0m "ResourceGroup" = "poc-ci-ultbe8cegdiumjnbc"
+        } [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m grant {
+          [31m-[0m[0m id          = "f2c0cc9527b7e2f18e142f3cf27d97ede398e906254aa73ab68bfa5c1a80b346" [90m-> null[0m[0m
+          [31m-[0m[0m permissions = [
+              [31m-[0m[0m "FULL_CONTROL",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m type        = "CanonicalUser" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m server_side_encryption_configuration {
+          [31m-[0m[0m rule {
+              [31m-[0m[0m bucket_key_enabled = false [90m-> null[0m[0m
+
+              [31m-[0m[0m apply_server_side_encryption_by_default {
+                  [31m-[0m[0m kms_master_key_id = "arn:aws:kms:ap-southeast-2:<ACCOUNT_ID>:key/db905ba7-04d9-4467-9bd6-d9f69c645db4" [90m-> null[0m[0m
+                  [31m-[0m[0m sse_algorithm     = "aws:kms" [90m-> null[0m[0m
+                }
+            }
+        }
+
+      [31m-[0m[0m versioning {
+          [31m-[0m[0m enabled    = true [90m-> null[0m[0m
+          [31m-[0m[0m mfa_delete = false [90m-> null[0m[0m
+        }
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_s3_bucket_public_access_block" "s3_bucket_access_config" {
+      [31m-[0m[0m block_public_acls       = true [90m-> null[0m[0m
+      [31m-[0m[0m block_public_policy     = true [90m-> null[0m[0m
+      [31m-[0m[0m bucket                  = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m id                      = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m ignore_public_acls      = true [90m-> null[0m[0m
+      [31m-[0m[0m restrict_public_buckets = true [90m-> null[0m[0m
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
+      [31m-[0m[0m bucket                = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+
+      [31m-[0m[0m rule {
+          [31m-[0m[0m bucket_key_enabled = false [90m-> null[0m[0m
+
+          [31m-[0m[0m apply_server_side_encryption_by_default {
+              [31m-[0m[0m kms_master_key_id = "arn:aws:kms:ap-southeast-2:<ACCOUNT_ID>:key/db905ba7-04d9-4467-9bd6-d9f69c645db4" [90m-> null[0m[0m
+              [31m-[0m[0m sse_algorithm     = "aws:kms" [90m-> null[0m[0m
+            }
+        }
+    }
+
+[1m  # module.s3backend.aws_s3_bucket_versioning.s3_versioning[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_s3_bucket_versioning" "s3_versioning" {
+      [31m-[0m[0m bucket                = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "poc-ci-ultbe8cegdiumjnbc-state-bucket" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+
+      [31m-[0m[0m versioning_configuration {
+          [31m-[0m[0m status     = "Enabled" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+    }
+
+[1m  # module.s3backend.random_string.rand[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_string" "rand" {
+      [31m-[0m[0m id          = "ultbe8cegdiumjnbcbb2agq6" [90m-> null[0m[0m
+      [31m-[0m[0m length      = 24 [90m-> null[0m[0m
+      [31m-[0m[0m lower       = true [90m-> null[0m[0m
+      [31m-[0m[0m min_lower   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_numeric = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_special = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_upper   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m number      = true [90m-> null[0m[0m
+      [31m-[0m[0m numeric     = true [90m-> null[0m[0m
+      [31m-[0m[0m result      = "ultbe8cegdiumjnbcbb2agq6" [90m-> null[0m[0m
+      [31m-[0m[0m special     = false [90m-> null[0m[0m
+      [31m-[0m[0m upper       = false [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 11 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m s3backend_config = {
+      [31m-[0m[0m bucket         = "poc-ci-ultbe8cegdiumjnbc-state-bucket"
+      [31m-[0m[0m dynamodb_table = "poc-ci-ultbe8cegdiumjnbc-state-lock"
+      [31m-[0m[0m region         = "ap-southeast-2"
+      [31m-[0m[0m role_arn       = "arn:aws:iam::<ACCOUNT_ID>:role/poc-ci-ultbe8cegdiumjnbc-tf-assume-role"
+    } [90m-> null[0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m[0m
+[0m[1mmodule.s3backend.aws_iam_role_policy_attachment.policy_attach: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role-20260531204730407900000001][0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_versioning.s3_versioning: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m[0m
+[0m[1mmodule.s3backend.aws_resourcegroups_group.resourcegroups_group: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-terraform-group][0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m[0m
+[0m[1mmodule.s3backend.aws_resourcegroups_group.resourcegroups_group: Destruction complete after 0s[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_server_side_encryption_configuration.s3_encryption: Destruction complete after 0s[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_public_access_block.s3_bucket_access_config: Destruction complete after 0s[0m
+[0m[1mmodule.s3backend.aws_s3_bucket_versioning.s3_versioning: Destruction complete after 0s[0m
+[0m[1mmodule.s3backend.aws_iam_role_policy_attachment.policy_attach: Destruction complete after 1s[0m
+[0m[1mmodule.s3backend.aws_iam_policy.iam_policy: Destroying... [id=arn:aws:iam::<ACCOUNT_ID>:policy/poc-ci-ultbe8cegdiumjnbc-tf-policy][0m[0m
+[0m[1mmodule.s3backend.aws_iam_role.iam_role: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-tf-assume-role][0m[0m
+[0m[1mmodule.s3backend.aws_iam_policy.iam_policy: Destruction complete after 0s[0m
+[0m[1mmodule.s3backend.aws_kms_key.kms_key: Destroying... [id=db905ba7-04d9-4467-9bd6-d9f69c645db4][0m[0m
+[0m[1mmodule.s3backend.aws_s3_bucket.s3_bucket: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-state-bucket][0m[0m
+[0m[1mmodule.s3backend.aws_dynamodb_table.dynamodb_table: Destroying... [id=poc-ci-ultbe8cegdiumjnbc-state-lock][0m[0m
+[0m[1mmodule.s3backend.aws_kms_key.kms_key: Destruction complete after 1s[0m
+[0m[1mmodule.s3backend.aws_iam_role.iam_role: Destruction complete after 1s[0m
+[0m[1mmodule.s3backend.aws_s3_bucket.s3_bucket: Destruction complete after 1s[0m
+[0m[1mmodule.s3backend.aws_dynamodb_table.dynamodb_table: Destruction complete after 7s[0m
+[0m[1mmodule.s3backend.random_string.rand: Destroying... [id=ultbe8cegdiumjnbcbb2agq6][0m[0m
+[0m[1mmodule.s3backend.random_string.rand: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 11 destroyed.[0m
+
+=== LEAK CHECK (tag ResourceGroup=poc-ci-ultbe8cegdiumjnbc) ===
+ignoring KMS key scheduled for deletion: arn:aws:kms:ap-southeast-2:<ACCOUNT_ID>:key/db905ba7-04d9-4467-9bd6-d9f69c645db4
+clean — no unexpected resource carries tag ResourceGroup=poc-ci-ultbe8cegdiumjnbc.
+
+=== DONE (exit 0) ===
+
+================================================================================
+POST-RUN VERIFICATION (plan §5.2) — 2026-06-01, account <ACCOUNT_ID>
+================================================================================
+Independent sweep (not via the script's own leak check):
+  - S3 buckets   matching poc-ci*  : NONE
+  - DynamoDB     matching poc-ci*  : NONE
+  - IAM roles    matching poc-ci*  : NONE
+  - KMS keys tagged terraform-s3backend-component: 5 present, ALL PendingDeletion
+    (deletion dates 2026-06-30 / 2026-07-01 — the default 30-day window).
+
+KMS keys cannot be hard-deleted; `terraform destroy` schedules them. The lingering
+keys are from the 5 deploy/destroy cycles run during PoC development today and are
+expected, not a leak. They will self-delete after the window, or vanish when the
+disposable account is torn down. The script's leak check correctly ignores
+PendingDeletion keys.
+
+VERDICT: full create -> consume -> destroy -> verify lifecycle PASSED end-to-end
+against a real disposable AWS account using only short-lived SSO credentials.
+A disposable AWS account is a viable CI substrate.
