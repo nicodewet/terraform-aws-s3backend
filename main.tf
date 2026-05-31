@@ -1,11 +1,7 @@
-// https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-provider "aws" {
-  region = "ap-southeast-2"
-  // https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files
-  // https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html
-  profile = "default"
-}
-
+// Provider configuration is intentionally NOT declared in this module. As noted
+// in versions.tf, this is a reusable module; the root/consumer module passes the
+// aws provider during init. Embedding a provider here (and hard-coding a profile)
+// would override the consumer's credentials — including AWS_PROFILE / SSO.
 data "aws_region" "current" {}
 
 // https://developer.hashicorp.com/terraform/language/resources/syntax#resource-syntax
