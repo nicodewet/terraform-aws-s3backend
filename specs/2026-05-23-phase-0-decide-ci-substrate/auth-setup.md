@@ -30,12 +30,14 @@ gives you enough to create + destroy every resource the module uses.
 
 1.1. Sign in to the management account, open **IAM Identity Center**.
 
-1.2. **Permission sets** → check if one called something like
-`PhaseZeroPoC` or `DisposableAccountAdmin` exists. If not, create one:
-- Name: `DisposableAccountAdmin` (or your preference)
-- Session duration: 8 hours (the default 1h is too short for iterative
-  work; longer than 12h is overkill)
-- Permissions: attach the AWS-managed `AdministratorAccess` policy
+1.2. **Permission sets** → use the AWS-managed `AdministratorAccess`
+permission set (it's a predefined option Identity Center offers out of
+the box — no need to author a custom one for a disposable account). If
+you prefer a custom-named set (e.g. `DisposableAccountAdmin`) you can
+create one instead — just attach the AWS-managed `AdministratorAccess`
+policy and set an 8-hour session duration (the default 1h is too short
+for iterative work). Either way, the role provisioned in the sub-account
+is what matters downstream.
 
 **Why `AdministratorAccess` for this account specifically:** The
 disposable sub-account exists only for this PoC and (later) CI. Its
@@ -79,8 +81,10 @@ the page should show "Completed" before you move on.
 
 1.5. Note the **permission-set role name** that Identity Center provisions
 in the sub-account — it'll look like
-`AWSReservedSSO_DisposableAccountAdmin_<random-suffix>`. You won't type
-this; the AWS CLI discovers it. Just be aware it exists.
+`AWSReservedSSO_AdministratorAccess_<random-suffix>` (or
+`AWSReservedSSO_<your-permission-set-name>_<random-suffix>` if you used a
+custom one). You won't type this; the AWS CLI discovers it. Just be aware
+it exists.
 
 ## Step 2 — On your workstation (one-time)
 
@@ -103,7 +107,8 @@ A browser tab opens for one-time device authorization. Approve it.
 
 Back in the terminal, you'll be shown a list of accounts you have access
 to. Pick the **disposable sub-account**. Then pick the permission set
-(`DisposableAccountAdmin`).
+(`AdministratorAccess`, or your custom set from 1.2). If only one account
+and one role are available, the CLI selects them automatically.
 
 | Prompt | Value |
 |---|---|
@@ -123,8 +128,9 @@ aws sts get-caller-identity --profile s3backend-poc
 
 Expected output: a JSON blob whose `Account` field matches the
 disposable sub-account ID, and whose `Arn` field includes
-`assumed-role/AWSReservedSSO_DisposableAccountAdmin_*`. If you see this,
-auth is wired correctly.
+`assumed-role/AWSReservedSSO_*` (e.g.
+`AWSReservedSSO_AdministratorAccess_<suffix>`). If you see this, auth is
+wired correctly.
 
 If you get `Error loading SSO Token: Token for ... does not exist`,
 just run `aws sso login --profile s3backend-poc` first.

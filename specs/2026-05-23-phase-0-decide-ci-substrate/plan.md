@@ -17,14 +17,16 @@ in place:
 1.2. Sanity-check that no other section of `tech-stack.md` still implies
 the question is open.
 
-## 2. Identify the disposable account and credential path
+## 2. Set up local AWS auth to the disposable account
 
-2.1. Confirm the AWS Organizations sub-account ID and the IAM identity
-the maintainer will use locally for the PoC run. Record it (not the
-secret material) in `requirements.md` §Context if missing.
+2.1. Follow [[auth-setup]] end to end. Decisions already baked in there:
+IAM Identity Center (SSO) federating into the Org sub-account, profile
+name `s3backend-poc`, region `ap-southeast-2`.
 
-2.2. Verify `aws sts get-caller-identity` against that account works
-locally before writing any script.
+2.2. Verify with
+`aws sts get-caller-identity --profile s3backend-poc`. The `Account`
+field must match the disposable sub-account; the `Arn` must include
+`AWSReservedSSO_*`. Do not proceed until this passes.
 
 ## 3. Build the minimal PoC script
 

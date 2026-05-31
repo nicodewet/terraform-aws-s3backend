@@ -83,3 +83,12 @@ override.tf.json
 # They are machine-specific and must not be committed.
 .terraformrc
 terraform.rc
+
+# ------------------------------------------------------------------------
+# 9) Local scratch notes
+# ------------------------------------------------------------------------
+# tmp.md files are local scratchpads (e.g. captured account IDs, SSO
+# instance IDs, device codes). They hold org/account identifiers we don't
+# want on a public repo. Keep them local; never commit.
+tmp.md
+**/tmp.md
