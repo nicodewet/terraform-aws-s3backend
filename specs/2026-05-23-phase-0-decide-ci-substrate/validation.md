@@ -63,8 +63,9 @@ tick before the PR is approved. References [[requirements]] §Scope and
   `terraform validate` both succeed. (A fresh provider download can trip
   Terraform's plugin-start timeout on the first exec locally; re-running
   after the binary is warm passes. Environmental, not a code issue.)
-- [ ] The existing `tf-checks` and `terraform-security` GitHub Actions
-  workflows pass on this branch — **verify on the PR** (pending push).
+- [x] The existing `tf-checks` and `terraform-security` GitHub Actions
+  workflows pass on this branch — both green on PR #9 (Terraform Checks 18s,
+  Security Scans 25s).
 - [~] Module changed: `main.tf` and `iam.tf` were edited. **This deviates
   from the original "decision + PoC only" intent, and is justified** — the
   PoC could not complete without them, and both are genuine defect fixes the
