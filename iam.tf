@@ -60,6 +60,20 @@ data "aws_iam_policy_document" "policy_doc" {
     ]
     resources = [aws_dynamodb_table.dynamodb_table.arn]
   }
+
+  // The state bucket is encrypted with the module's KMS key (see kms_key in
+  // main.tf), so the assume-role principal needs to use that key to read and
+  // write state. Without these, S3 GetObject/PutObject on the encrypted state
+  // fail with 403. kms:Decrypt + kms:GenerateDataKey are the documented minimum
+  // for SSE-KMS read/write; DescribeKey covers backend metadata calls.
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:DescribeKey"
+    ]
+    resources = [aws_kms_key.kms_key.arn]
+  }
 }
 
 resource "aws_iam_policy" "iam_policy" {
