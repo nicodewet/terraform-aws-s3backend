@@ -46,17 +46,18 @@ locked to `read-all` at the workflow level.
 These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
 
 1. **CI substrate decision: LocalStack vs disposable AWS account.**
-   *Status: open.* TODO.md flags this as the first decision to make.
-   Constraints to weigh:
-   - Fidelity: real AWS catches IAM, KMS key-policy, and DynamoDB nuances
-     LocalStack imitates imperfectly (especially KMS grants and
-     `force_destroy` semantics).
-   - Cost & cleanup: the AWS account is created via AWS Organizations and
-     treated as disposable — every CI run must leave it empty.
-   - Speed: LocalStack is faster and free, which makes daily scheduled
-     runs trivial.
-   - Trust signal: the public "module works" badge is more credible if it
-     reflects a real AWS apply.
+   *Status: decided 2026-05-23 — disposable AWS account* (confirmed
+   end-to-end by PoC, 2026-06-01). Fidelity is the dominant reason: the
+   resources this module exercises hardest — KMS key policies/grants, IAM
+   assume-role trust, DynamoDB conditional writes for locking, and S3
+   `force_destroy` of versioned, KMS-encrypted objects — are exactly the ones
+   LocalStack imitates imperfectly, so a green simulator run would not prove the
+   module is production-ready. A throwaway PoC ran the full
+   create → consume → destroy → leak-check lifecycle against the disposable
+   account and, in doing so, caught real KMS-permission and provider-config
+   defects in the module that a simulator would likely have masked. See
+   `specs/2026-05-23-phase-0-decide-ci-substrate/` for the full reasoning, the
+   PoC script, and the run log.
    Decision blocks everything below.
 
 2. **Secure GitHub Actions ↔ AWS integration (OIDC, no long-lived keys).**

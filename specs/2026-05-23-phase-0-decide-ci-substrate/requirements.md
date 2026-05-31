@@ -49,12 +49,24 @@ In scope for this branch:
    the decision above with a short rationale and a pointer to this dir.
 2. Build a minimal proof-of-concept script that, against the disposable
    AWS account using locally-available credentials, performs:
-   - `terraform init && terraform apply` of `exercises/s3backend_deploy`
-   - `terraform init && terraform apply` of `exercises/s3backend_test`
-     using the backend outputs from the previous step
+   - `terraform init && terraform apply` of a deploy fixture that sources
+     **this repo's** module
+   - `terraform init && terraform apply` of a consumer fixture using the
+     backend outputs from the previous step
    - `terraform destroy` of both, in reverse order
    - A post-cleanup check that the disposable account has no
      module-tagged resources remaining
+
+   *Implementation note (added after the PoC run):* the fixtures live under
+   `ci/poc-fixture/{deploy,test}` rather than reusing
+   `exercises/s3backend_{deploy,test}`. The deploy exercise pins the
+   *published* registry module (so it would not gate this repo's code), and
+   the test exercise's backend block referenced `var.*`, which Terraform
+   forbids. The fixture sources the local module and supplies the backend
+   `assume_role` at init time. Running it also surfaced two real module
+   defects (an embedded `provider` block overriding consumer credentials, and
+   a missing KMS grant on the assume-role policy); both were fixed in
+   `main.tf` / `iam.tf` on this branch and need a version bump when released.
 3. Run the PoC end-to-end at least once against the disposable account.
    Capture the output in a log file under this feature dir.
 4. Document how to run the PoC (prereqs, env vars, expected output).
@@ -92,5 +104,6 @@ In scope for this branch:
   and bullet 4 (LocalStack vs AWS question).
 - Mission ordering: [[mission]] §Ordered Goals.
 - Current gap entry being resolved: [[tech-stack]] §Gaps item 1.
-- Existing exercises this branch leans on: `exercises/s3backend_deploy`
-  and `exercises/s3backend_test`.
+- PoC fixtures: `ci/poc-fixture/{deploy,test}` (self-contained; source the
+  local module). Modelled on `exercises/s3backend_{deploy,test}`, which
+  proved unusable as-is — see §Scope item 2.
