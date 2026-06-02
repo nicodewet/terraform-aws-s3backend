@@ -1,0 +1,46 @@
+# OIDC smoke test — Phase 1 (spec: specs/2026-06-01-phase-1-secure-aws-oidc/).
+#
+# Proves GitHub Actions can authenticate to the disposable AWS account KEYLESSLY
+# via OIDC: no IAM user, no access keys, no GitHub secret. It stops at
+# `aws sts get-caller-identity` — the module end-to-end test is Phase 2.
+#
+# SECURITY: this job must never run with AWS creds on a fork PR. There is no
+# `pull_request` trigger, and the CI role's trust policy only admits
+# refs/heads/main + refs/tags/* anyway (defence in depth).
+name: OIDC Smoke Test
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  workflow_dispatch:
+
+# Least-privilege token permissions: id-token to mint the OIDC JWT, nothing else
+# writable.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  whoami:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Set as a repo variable after applying ci/oidc-bootstrap (keeps the
+          # account ID out of the repo). See the spec's oidc-setup.md.
+          role-to-assume: ${{ vars.CI_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: Who am I (and is it the expected role)?
+        run: |
+          set -euo pipefail
+          id_json="$(aws sts get-caller-identity)"
+          echo "$id_json"
+          arn="$(echo "$id_json" | jq -r '.Arn')"
+          # Fail loudly if we authenticated as anything other than the CI role —
+          # a misconfigured role-to-assume should not pass silently.
+          echo "$arn" | grep -q 'assumed-role/s3backend-ci/' \
+            || { echo "::error::unexpected caller ARN: $arn"; exit 1; }
+          echo "OK — keyless OIDC auth as s3backend-ci confirmed."
