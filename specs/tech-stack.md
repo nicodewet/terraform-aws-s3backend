@@ -61,8 +61,14 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    Decision blocks everything below.
 
 2. **Secure GitHub Actions ↔ AWS integration (OIDC, no long-lived keys).**
-   Only relevant if (1) chooses real AWS. Use OIDC federation, scope the
-   trust policy to this repo + a CI-only role, never persist access keys.
+   *Status: implemented 2026-06-02 — GitHub OIDC.* `ci/oidc-bootstrap/`
+   (Terraform, applied once by the maintainer with SSO admin — never by CI)
+   provisions the GitHub OIDC provider and a least-privilege `s3backend-ci`
+   role. The trust policy is scoped to this repo on `refs/heads/main` +
+   `refs/tags/*`, so fork PRs cannot assume it. The `oidc-smoke-test` workflow
+   proves keyless auth (`sts get-caller-identity`, no long-lived secret); by
+   design it runs on push to `main`, so it is confirmed once Phase 1 lands.
+   See `specs/2026-06-01-phase-1-secure-aws-oidc/`.
 
 3. **End-to-end "GIVEN/WHEN/THEN" test harness.**
    Provision the module, run a small consumer (the existing
