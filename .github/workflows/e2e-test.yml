@@ -1,0 +1,63 @@
+# End-to-end module test — Phase 2 (spec: specs/2026-06-03-phase-2-e2e-test/).
+#
+# Runs the Terratest harness under test/ against the disposable AWS account:
+# deploy THIS repo's module, consume the backend via its assume-role, assert the
+# state object + DynamoDB digest exist, then destroy everything and leak-check.
+#
+# Auth is keyless OIDC (Phase 1 `s3backend-ci` role) — no long-lived secret.
+#
+# SECURITY: this job touches AWS, so it must NEVER run on a fork PR. There is no
+# `pull_request` trigger, and the CI role's trust policy only admits
+# refs/heads/main + refs/tags/* anyway (defence in depth). The trigger is
+# push-to-main per the spec's settled open decision (Option A); a `schedule:`
+# trigger for daily drift detection is Phase 3 and is intentionally NOT added
+# here.
+name: E2E Module Test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least-privilege token permissions: id-token to mint the OIDC JWT, nothing else
+# writable.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  e2e:
+    name: Terratest end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Repo variable set after applying ci/oidc-bootstrap (keeps the
+          # account ID out of the repo). See the Phase 1 spec's oidc-setup.md.
+          role-to-assume: ${{ vars.CI_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          # Pin to the exact Go declared by the test module so CI == local.
+          go-version-file: test/go.mod
+          cache-dependency-path: test/go.sum
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: 1.14.5
+          terraform_wrapper: false
+
+      # Runs the single GIVEN/WHEN/THEN test. The in-test leak assertion fails
+      # the job if any module-tagged resource survives teardown, so no separate
+      # leak step is needed. -timeout covers KMS+S3+DynamoDB+IAM create/destroy
+      # twice (Phase 0 runs were ~3-5 min; 30m is generous headroom).
+      - name: Run e2e test
+        working-directory: test
+        run: go test ./... -timeout 30m -v
