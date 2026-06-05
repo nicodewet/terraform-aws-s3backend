@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           # Set as a repo variable after applying ci/oidc-bootstrap (keeps the
           # account ID out of the repo). See the spec's oidc-setup.md.

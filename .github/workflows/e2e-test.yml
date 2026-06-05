@@ -31,10 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           # Repo variable set after applying ci/oidc-bootstrap (keeps the
           # account ID out of the repo). See the Phase 1 spec's oidc-setup.md.
@@ -42,14 +42,14 @@ jobs:
           aws-region: ap-southeast-2
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           # Pin to the exact Go declared by the test module so CI == local.
           go-version-file: test/go.mod
           cache-dependency-path: test/go.sum
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.14.5
           terraform_wrapper: false

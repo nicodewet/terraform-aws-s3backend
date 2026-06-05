@@ -19,7 +19,7 @@ jobs:
       # Step 1: Checkout the same commit that triggered Terraform Checks
       # This ensures we scan the exact code that just passed fmt/validate/TFLint.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # head_sha is the commit that triggered the workflow_run
           ref: ${{ github.event.workflow_run.head_sha }}
