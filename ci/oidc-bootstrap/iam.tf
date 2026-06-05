@@ -189,7 +189,11 @@ data "aws_iam_policy_document" "ci_permissions" {
   }
 
   # Resource Groups — the query-based group the module creates, scoped to the
-  # *-terraform-group name pattern.
+  # *-terraform-group name pattern. GetGroupConfiguration is read by the AWS
+  # provider on every group refresh (to detect configuration- vs query-based
+  # groups); without it both apply and destroy fail with a 403 reading the
+  # group back. Empirically confirmed by the first CI e2e run (Phase 0-style
+  # least-privilege iteration the spec anticipated).
   statement {
     sid    = "ModuleResourceGroup"
     effect = "Allow"
@@ -198,6 +202,7 @@ data "aws_iam_policy_document" "ci_permissions" {
       "resource-groups:DeleteGroup",
       "resource-groups:GetGroup",
       "resource-groups:GetGroupQuery",
+      "resource-groups:GetGroupConfiguration",
       "resource-groups:UpdateGroup",
       "resource-groups:UpdateGroupQuery",
       "resource-groups:GetTags",
