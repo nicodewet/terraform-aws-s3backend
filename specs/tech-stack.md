@@ -90,12 +90,15 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    `specs/2026-06-03-phase-2-e2e-test/`.
 
 4. **Daily scheduled CI run.**
-   *Status: trigger added 2026-06-06 — Phase 3 partial.* `e2e-test.yml` now has
-   a daily `schedule:` (`cron: "19 6 * * *"`) so drift against provider/AWS
-   updates is caught without a commit. Scheduled runs execute on `main`, which
-   the OIDC trust already admits — no trust change. Still open before Phase 3
-   closes: auto-open a `drift`-labelled issue on failure, and observe a week of
-   green daily runs ([[roadmap]] Phase 3 "Done when").
+   *Status: implemented 2026-06-06 — Phase 3 pending observation.* `e2e-test.yml`
+   has a daily `schedule:` (`cron: "19 6 * * *"`) so drift against provider/AWS
+   updates is caught without a commit, plus a `drift-issue` job that opens (or
+   comments on) a `drift`-labelled GitHub issue when a *scheduled* run fails —
+   so an unattended failure is not lost. Scheduled runs execute on `main`, which
+   the OIDC trust already admits — no trust change; `issues: write` is scoped to
+   that job only, off the AWS-touching job. Remaining before [[roadmap]] Phase 3
+   reads done: observe a week of green daily runs (an observation window, not a
+   code change).
 
 5. **"Module works" public badge in README.**
    Surface the e2e workflow status badge alongside the existing

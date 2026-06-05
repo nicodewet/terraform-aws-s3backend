@@ -67,3 +67,41 @@ jobs:
       - name: Run e2e test
         working-directory: test
         run: go test ./... -timeout 30m -v
+
+  # Phase 3 — on a failed *scheduled* run, surface it as a `drift`-labelled
+  # issue so an unattended failure is not silently lost. Gated to schedule only:
+  # push/dispatch failures are already seen by whoever triggered them. Separate
+  # job so `issues: write` stays off the AWS-touching job (least privilege); it
+  # carries no id-token.
+  drift-issue:
+    name: Open drift issue on scheduled failure
+    needs: e2e
+    if: ${{ failure() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update the drift issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          # Ensure the label exists (idempotent — ignore "already exists").
+          gh label create drift --color B60205 \
+            --description "Scheduled e2e drift-check failure" 2>/dev/null || true
+          # Dedup: one open drift issue at a time — comment on it rather than
+          # stacking a new issue every day the drift persists.
+          existing="$(gh issue list --label drift --state open \
+            --json number --jq '.[0].number // empty')"
+          stamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          body="The daily scheduled end-to-end run failed — likely provider/AWS drift or a real module regression. Run: $RUN_URL (detected $stamp). If teardown also failed, the disposable account may hold an orphaned namespace; after investigating, sweep it with ./ci/cleanup-orphan-namespace.sh <namespace>."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Failed again — $RUN_URL ($stamp)."
+            echo "commented on existing drift issue #$existing"
+          else
+            gh issue create --title "Scheduled e2e drift check failed" \
+              --label drift --body "$body"
+            echo "opened a new drift issue"
+          fi
