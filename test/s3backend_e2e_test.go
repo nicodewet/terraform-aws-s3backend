@@ -29,7 +29,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	rgtypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
@@ -99,17 +98,30 @@ func TestS3BackendEndToEnd(t *testing.T) {
 		// -reconfigure so retries re-init cleanly against the partial backend.
 		Reconfigure: true,
 		NoColor:     true,
+
+		// IAM is eventually consistent: the module's role + attached policy
+		// created in WHEN-1 take a few seconds to become assumable and usable.
+		// Until they propagate, the backend's assume-role (sts:AssumeRole 403)
+		// or its first state read (HeadObject 403 / Forbidden) fails — Phase 0
+		// saw this <1s after create. Retry the whole command on exactly those
+		// transient errors.
+		//
+		// This MUST be expressed via the command options, not an outer
+		// retry.DoWithRetry around InitAndApplyE: Terratest wraps a failed
+		// terraform command in a retry.FatalError, which DoWithRetry refuses to
+		// retry (so it would bail after the first attempt). These options also
+		// make the deferred Destroy resilient to the same propagation window.
+		MaxRetries:         8,
+		TimeBetweenRetries: 10 * time.Second,
+		RetryableTerraformErrors: map[string]string{
+			".*is not authorized to perform: sts:AssumeRole.*": "module role not yet assumable (IAM eventual consistency)",
+			".*failed to refresh cached credentials.*":         "module role not yet assumable (IAM eventual consistency)",
+			".*HeadObject.*StatusCode: 403.*":                  "module role policy not yet propagated (IAM eventual consistency)",
+			".*api error Forbidden.*":                          "module role policy not yet propagated (IAM eventual consistency)",
+		},
 	}
 	defer terraform.Destroy(t, consumerOpts)
-
-	// IAM is eventually consistent: the role + policy created in WHEN-1 can take
-	// a few seconds to become assumable with full S3/KMS rights. Until then the
-	// backend's state HeadObject returns 403 (Phase 0 saw this <1s after create).
-	// Retry the whole init+apply with linear-ish backoff.
-	retry.DoWithRetry(t, "consumer init+apply (absorb IAM eventual consistency)", 6, 10*time.Second,
-		func() (string, error) {
-			return terraform.InitAndApplyE(t, consumerOpts)
-		})
+	terraform.InitAndApply(t, consumerOpts)
 
 	// ----------------------------------------------------------------------
 	// THEN-1 — the state object exists in the bucket.
