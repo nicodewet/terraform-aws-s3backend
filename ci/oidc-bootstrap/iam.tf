@@ -117,6 +117,9 @@ data "aws_iam_policy_document" "ci_permissions" {
   }
 
   # DynamoDB — the state lock table, scoped to the *-state-lock name pattern.
+  # dynamodb:GetItem lets the Phase 2 e2e read back the persistent digest item
+  # (THEN-2: LockID = <bucket>/team1/my-cool-project-md5) to prove the consumer
+  # wrote state. Read-only and table-scoped.
   statement {
     sid    = "DynamoDbLockTable"
     effect = "Allow"
@@ -131,6 +134,7 @@ data "aws_iam_policy_document" "ci_permissions" {
       "dynamodb:ListTagsOfResource",
       "dynamodb:TagResource",
       "dynamodb:UntagResource",
+      "dynamodb:GetItem",
     ]
     resources = local.module_ddb_arns
   }
@@ -170,6 +174,18 @@ data "aws_iam_policy_document" "ci_permissions" {
       "iam:DeletePolicyVersion",
     ]
     resources = local.module_policy_arns
+  }
+
+  # Resource Groups Tagging API — the Phase 2 e2e leak check enumerates
+  # resources still carrying the module's ResourceGroup tag after teardown.
+  # tag:GetResources is a read-only, account-wide query that does not support
+  # resource-level scoping, so Resource must be "*"; the single action keeps the
+  # blast radius to read-only discovery.
+  statement {
+    sid       = "LeakCheckTagging"
+    effect    = "Allow"
+    actions   = ["tag:GetResources"]
+    resources = ["*"]
   }
 
   # Resource Groups — the query-based group the module creates, scoped to the

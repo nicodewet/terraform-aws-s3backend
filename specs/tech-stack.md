@@ -30,6 +30,8 @@ plus the gaps we've explicitly decided to close. See [[mission]] for why.
 |---------------------------|------------------------------------------|--------------|
 | `tf-checks.yml`           | push + PR on all branches                | fmt, init (no backend), validate, tflint. |
 | `terraform-security.yml`  | `workflow_run` after `tf-checks` succeeds | Checkov scan, `hard_fail_on: HIGH`, `skip_path: exercises/`. |
+| `oidc-smoke-test.yml`     | push to `main` + tags + dispatch          | Proves keyless OIDC auth (`sts get-caller-identity`). |
+| `e2e-test.yml`            | push to `main` + dispatch                 | Terratest end-to-end via OIDC; deploy → consume → assert → destroy → leak-check. No fork-PR path. |
 
 Both workflow status badges are rendered in the README. Permissions are
 locked to `read-all` at the workflow level.
@@ -71,10 +73,21 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    See `specs/2026-06-01-phase-1-secure-aws-oidc/`.
 
 3. **End-to-end "GIVEN/WHEN/THEN" test harness.**
-   Provision the module, run a small consumer (the existing
-   `exercises/s3backend_test`) against it, then destroy everything. Tool
-   choice (Terratest in Go, native `terraform test`, or a shell harness)
-   is part of this phase, not predetermined.
+   *Status: implemented 2026-06-04 — Terratest (Go).* `test/` holds a single
+   GIVEN/WHEN/THEN test (`s3backend_e2e_test.go`) plus dedicated
+   `test/fixtures/{deploy,consumer}` configs that exercise **this repo's**
+   module (`source = "../../../"`) — not the `exercises/`. It deploys the
+   backend, consumes it via the module's assume-role (consumer init retried to
+   absorb IAM eventual consistency), asserts the state object and the DynamoDB
+   digest item exist, then `defer`-destroys both (consumer before deploy) and
+   leak-checks that zero module-tagged resources survive (KMS keys in
+   `PendingDeletion` excepted). Terratest was chosen over native
+   `terraform test` / a shell harness because the assertions poke AWS with the
+   SDK and `defer terraform.Destroy` + `retry.DoWithRetry` give reliable
+   teardown and propagation handling — and it is what consumers of a public
+   module expect to see. The `e2e-test.yml` workflow runs it on push to `main`
+   via the Phase 1 OIDC role (no fork-PR path). See
+   `specs/2026-06-03-phase-2-e2e-test/`.
 
 4. **Daily scheduled CI run.**
    The README already calls this out as a goal. A `schedule:` trigger on
