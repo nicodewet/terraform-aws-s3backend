@@ -31,7 +31,7 @@ plus the gaps we've explicitly decided to close. See [[mission]] for why.
 | `tf-checks.yml`           | push + PR on all branches                | fmt, init (no backend), validate, tflint. |
 | `terraform-security.yml`  | `workflow_run` after `tf-checks` succeeds | Checkov scan, `hard_fail_on: HIGH`, `skip_path: exercises/`. |
 | `oidc-smoke-test.yml`     | push to `main` + tags + dispatch          | Proves keyless OIDC auth (`sts get-caller-identity`). |
-| `e2e-test.yml`            | push to `main` + dispatch                 | Terratest end-to-end via OIDC; deploy → consume → assert → destroy → leak-check. No fork-PR path. |
+| `e2e-test.yml`            | push to `main` + daily schedule + dispatch | Terratest end-to-end via OIDC; deploy → consume → assert → destroy → leak-check. Daily `cron` is the Phase 3 drift check. No fork-PR path. |
 
 Both workflow status badges are rendered in the README. Permissions are
 locked to `read-all` at the workflow level.
@@ -90,9 +90,12 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    `specs/2026-06-03-phase-2-e2e-test/`.
 
 4. **Daily scheduled CI run.**
-   The README already calls this out as a goal. A `schedule:` trigger on
-   the end-to-end workflow gives us drift detection against provider
-   updates even without commits.
+   *Status: trigger added 2026-06-06 — Phase 3 partial.* `e2e-test.yml` now has
+   a daily `schedule:` (`cron: "19 6 * * *"`) so drift against provider/AWS
+   updates is caught without a commit. Scheduled runs execute on `main`, which
+   the OIDC trust already admits — no trust change. Still open before Phase 3
+   closes: auto-open a `drift`-labelled issue on failure, and observe a week of
+   green daily runs ([[roadmap]] Phase 3 "Done when").
 
 5. **"Module works" public badge in README.**
    Surface the e2e workflow status badge alongside the existing

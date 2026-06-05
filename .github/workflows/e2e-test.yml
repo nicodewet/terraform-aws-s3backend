@@ -8,15 +8,21 @@
 #
 # SECURITY: this job touches AWS, so it must NEVER run on a fork PR. There is no
 # `pull_request` trigger, and the CI role's trust policy only admits
-# refs/heads/main + refs/tags/* anyway (defence in depth). The trigger is
-# push-to-main per the spec's settled open decision (Option A); a `schedule:`
-# trigger for daily drift detection is Phase 3 and is intentionally NOT added
-# here.
+# refs/heads/main + refs/tags/* anyway (defence in depth). Triggers are
+# push-to-main (Phase 2, Option A) and a daily schedule (Phase 3); both run on
+# the default branch, so neither widens the trust surface.
 name: E2E Module Test
 
 on:
   push:
     branches: [main]
+  schedule:
+    # Phase 3 — daily drift check: catch provider/AWS regressions without a
+    # commit. 06:19 UTC, deliberately off the top-of-hour congestion. Scheduled
+    # runs execute on the default branch (github.ref = refs/heads/main), which
+    # the OIDC trust policy already admits — no trust change needed. Note:
+    # GitHub disables scheduled workflows after 60 days of no repo activity.
+    - cron: "19 6 * * *"
   workflow_dispatch:
 
 # Least-privilege token permissions: id-token to mint the OIDC JWT, nothing else
