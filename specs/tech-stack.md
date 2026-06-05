@@ -33,8 +33,12 @@ plus the gaps we've explicitly decided to close. See [[mission]] for why.
 | `oidc-smoke-test.yml`     | push to `main` + tags + dispatch          | Proves keyless OIDC auth (`sts get-caller-identity`). |
 | `e2e-test.yml`            | push to `main` + daily schedule + dispatch | Terratest end-to-end via OIDC; deploy → consume → assert → destroy → leak-check. Daily `cron` is the Phase 3 drift check. No fork-PR path. |
 
-Both workflow status badges are rendered in the README. Permissions are
-locked to `read-all` at the workflow level.
+The `tf-checks` and `terraform-security` status badges are rendered in the
+README (the e2e "module works" badge is Phase 4). Permissions are per-workflow,
+least-privilege: `tf-checks`/`terraform-security` are `read-all`;
+`oidc-smoke-test`/`e2e-test` grant only the `id-token: write` + `contents: read`
+needed for keyless OIDC, and `e2e-test`'s scheduled drift-issue job adds a
+scoped `issues: write` (on that job alone, not the AWS-touching job).
 
 ## Registry & Release
 
