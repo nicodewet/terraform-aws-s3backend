@@ -7,6 +7,9 @@ phases assume earlier ones are green.
 
 ## Phase 0 — Decide the CI substrate
 
+**Status: ✅ Done (2026-06-01).** Decision recorded in [[tech-stack]] §Gaps
+item 1; PoC ran green against the disposable account.
+
 **Goal.** Pick LocalStack vs a disposable AWS account for end-to-end CI,
 record the decision, and prove the chosen substrate end-to-end with a
 minimal proof-of-concept.
@@ -34,6 +37,9 @@ decision.
 
 ## Phase 1 — Secure GitHub Actions ↔ AWS integration
 
+**Status: ✅ Done (2026-06-02).** GitHub OIDC + least-privilege `s3backend-ci`
+role; keyless auth confirmed. See `specs/2026-06-01-phase-1-secure-aws-oidc/`.
+
 **Goal.** Keyless, repo-scoped access to the CI AWS account.
 
 - Configure GitHub's OIDC provider in the CI AWS account.
@@ -47,6 +53,9 @@ decision.
 long-lived secrets in the repo.
 
 ## Phase 2 — End-to-end "GIVEN / WHEN / THEN" workflow
+
+**Status: ✅ Done (2026-06-06).** Terratest harness, green via OIDC. See
+`specs/2026-06-03-phase-2-e2e-test/`.
 
 **Goal.** Prove the module actually deploys and tears down.
 
@@ -64,7 +73,20 @@ long-lived secrets in the repo.
 **Done when.** A single workflow runs end-to-end on every push and PR,
 and the disposable account is empty after each run.
 
+**As built (deviations, see the spec).** Harness = **Terratest (Go)**. The
+fixtures are dedicated `test/fixtures/{deploy,consumer}` using **this repo's**
+module (`source = "../../../"`), **not** the `exercises/` — Phase 0 found the
+exercises unusable (deploy pins the published registry module; the test
+exercise's backend used `var.*`). THEN also asserts the persistent DynamoDB
+**digest** item, not a transient lock. Trigger is **push to `main`** (Option A),
+not "every push and PR" — Phase 1's fork-isolation constraint excludes fork PRs
+from the AWS-touching job.
+
 ## Phase 3 — Daily scheduled drift check
+
+**Status: ✅ Implemented (2026-06-06); observation pending.** Daily `schedule:`
+(`cron: "19 6 * * *"`) + a `drift`-labelled-issue job on scheduled failure.
+"Done when" below still needs a week of green daily runs to elapse.
 
 **Goal.** Catch provider/AWS regressions without waiting for a commit.
 
