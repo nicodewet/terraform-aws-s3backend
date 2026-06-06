@@ -128,6 +128,39 @@ genuine `vX.Y.Z`.
 **Done when.** Tagging `vX.Y.Z` requires no manual steps beyond `git tag`
 and `git push --tags`.
 
+## Phase 6 — Cleanup & hygiene
+
+**Status: 🔜 Planned (2026-06-06).**
+
+**Goal.** Pay down the small debts left after Phases 0–5, now that the
+spec / CI / release machinery is the source of truth.
+
+- **Remove the redundant top-level `TODO.md`.** Its "Now / Next" notes are the
+  pre-spec scratch that became Phases 0–2; [[mission]], [[roadmap]] and
+  [[tech-stack]] now carry that intent. Delete it — git history preserves it.
+- **Fix the "module works" badge label.** A native badge renders the *workflow
+  name* — currently `E2E Module Test` — while the README prose and the
+  [[mission]] success signal call it "module works". Rename the e2e workflow to
+  `Module Works` (recommended — the badge then says what the mission promises;
+  the badge URL is by filename, so it keeps working) **or** reword the prose.
+  Pick one so they agree.
+- **Constrain auto-generated release notes.** Because every 0.x release is a
+  pre-release, `gh release --generate-notes` finds no prior non-prerelease
+  baseline and walks back to the repo start (`v0.7.0`'s notes listed the entire
+  history). Pin the baseline (e.g. `--notes-start-tag`) or accept it until the
+  first non-prerelease `v1.0.0`.
+- **Decide the fate of the Phase 0 PoC** (`ci/poc-decide-ci-substrate.sh` +
+  `ci/poc-fixture/`), kept as a local quick-check in Phase 2 — retire it now
+  that Terratest is the harness, or keep it and note why.
+
+**Note.** Documentation changes reach the Terraform Registry only at the next
+semver tag — the Registry renders the README from the latest *published* version
+(now `0.7.0`), not from `main`. Batch doc cleanup so it ships with a tag.
+
+**Done when.** `TODO.md` is gone, the badge label and prose agree, and the
+release-notes-baseline and PoC-retirement calls are made and noted in
+[[tech-stack]].
+
 ## Out of Scope (for this roadmap)
 
 - Multi-region or multi-account topologies inside the module itself.
