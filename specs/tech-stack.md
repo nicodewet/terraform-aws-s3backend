@@ -33,8 +33,8 @@ plus the gaps we've explicitly decided to close. See [[mission]] for why.
 | `oidc-smoke-test.yml`     | push to `main` + tags + dispatch          | Proves keyless OIDC auth (`sts get-caller-identity`). |
 | `e2e-test.yml`            | push to `main` + daily schedule + dispatch | Terratest end-to-end via OIDC; deploy → consume → assert → destroy → leak-check. Daily `cron` is the Phase 3 drift check. No fork-PR path. |
 
-The `tf-checks` and `terraform-security` status badges are rendered in the
-README (the e2e "module works" badge is Phase 4). Permissions are per-workflow,
+The `tf-checks`, `terraform-security`, and `e2e-test` ("module works") status
+badges are rendered on the README badge row. Permissions are per-workflow,
 least-privilege: `tf-checks`/`terraform-security` are `read-all`;
 `oidc-smoke-test`/`e2e-test` grant only the `id-token: write` + `contents: read`
 needed for keyless OIDC, and `e2e-test`'s scheduled drift-issue job adds a
@@ -105,8 +105,12 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    code change).
 
 5. **"Module works" public badge in README.**
-   Surface the e2e workflow status badge alongside the existing
-   fmt/validate and Checkov badges.
+   *Status: done 2026-06-06.* The native `e2e-test.yml` workflow badge
+   (`?branch=main`) sits on the README badge row beside the fmt/validate and
+   Checkov badges, with a short paragraph stating what it proves (lifecycle +
+   no-leak against a real disposable account via OIDC, push + daily) and its
+   honest limit. It is the live workflow badge, so it cannot show green unless a
+   real run was green. See `specs/2026-06-06-phase-4-module-works-badge/`.
 
 6. **Release automation.**
    Once the above is green, automate tag → changelog → Registry signal.

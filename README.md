@@ -1,6 +1,16 @@
 # Production-ready S3 Backend Module
 
-[![Terraform Checks](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml) [![Terraform Security Scans](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml)
+[![Terraform Checks](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/tf-checks.yml) [![Terraform Security Scans](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml/badge.svg)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/terraform-security.yml) [![Module Works (e2e)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/e2e-test.yml/badge.svg?branch=main)](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/e2e-test.yml)
+
+The **Module Works** badge is live, not decorative. On every push to `main` and
+once daily, CI deploys *this* module into a real, disposable AWS account using
+keyless [OIDC](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
+(no long-lived keys), writes real Terraform state through the module's
+assume-role, asserts the state object and the DynamoDB lock digest exist, then
+destroys everything and verifies that zero resources leak. It is a lifecycle and
+no-leak signal — proof the module provisions and tears down cleanly against real
+AWS — not a guarantee of every property. Click the badge for the
+[run history](https://github.com/nicodewet/terraform-aws-s3backend/actions/workflows/e2e-test.yml).
 
 
 
