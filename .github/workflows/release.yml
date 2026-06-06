@@ -64,13 +64,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.ctx.outputs.tag }}
+          VERSION: ${{ steps.ctx.outputs.version }}
         run: |
           set -euo pipefail
+          # Pre-1.0: mark 0.x as a pre-release to match the existing v0.1.0–v0.6.0
+          # convention. At v1.0.0+ this falls away and the release is "Latest".
+          args=(--verify-tag --generate-notes --title "$TAG")
+          if [ "${VERSION%%.*}" = "0" ]; then
+            args+=(--prerelease)
+            echo "0.x version — creating as a pre-release."
+          fi
           # Idempotent: re-running on an existing tag must not error or duplicate.
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists — skipping creation."
           else
-            gh release create "$TAG" --verify-tag --generate-notes --title "$TAG"
+            gh release create "$TAG" "${args[@]}"
             echo "Created GitHub Release $TAG."
           fi
 

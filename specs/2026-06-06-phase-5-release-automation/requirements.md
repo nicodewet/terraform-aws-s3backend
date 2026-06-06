@@ -11,8 +11,13 @@ builds on the now-green CI (Phases 2–4).
 - The **git tag IS the release**: pushing a semver tag (`v0.1.0` … `v0.6.0`
   today) triggers the Registry's webhook and it publishes automatically. The
   Registry reports the version without the `v` (`0.6.0`).
-- No GitHub Releases, no changelog, no release workflow — tag-and-push is a bare
-  manual step and leaves no human-readable release notes behind.
+- GitHub Releases for `v0.1.0`–`v0.6.0` exist but were **hand-created** in 2024
+  (descriptive titles, all flagged *pre-release*) — there is no changelog and no
+  release workflow, so each one was manual. *(Corrected during implementation:
+  the spec first assumed there were no Releases at all.)* Going forward the
+  workflow auto-creates them with generated notes; new 0.x releases keep the
+  pre-release flag, and the idempotency guard means it never clobbers an
+  existing Release.
 
 ## Going-in decisions
 
