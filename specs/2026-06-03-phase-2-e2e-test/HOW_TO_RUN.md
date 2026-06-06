@@ -88,7 +88,8 @@ is the defence-in-depth backstop.
   `ci/poc-fixture/` — which these fixtures are promoted from — does the same.
   Provider drift within the module's `~>` constraints is acceptable and is part
   of what a future daily run is meant to catch.
-- **Phase 0 PoC kept as a local quick-check.** `ci/poc-decide-ci-substrate.sh`
-  + `ci/poc-fixture/` are superseded by Terratest for CI but retained as a
-  dependency-free local smoke test (no Go toolchain needed). Retiring them is a
-  tidy-up, not a blocker.
+- **Phase 0 PoC kept as a local quick-check** *(superseded — retired in
+  Phase 6, 2026-06-06).* `ci/poc-decide-ci-substrate.sh` + `ci/poc-fixture/`
+  were a dependency-free local smoke test, kept "for now" at Phase 2; once
+  Terratest proved it runs locally too (above), they were removed as the
+  promised tidy-up. Git history preserves them.
