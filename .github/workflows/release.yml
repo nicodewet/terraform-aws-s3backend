@@ -52,12 +52,20 @@ jobs:
             v[0-9]*.[0-9]*.[0-9]*) ;;
             *) echo "::error::unexpected tag format: $tag (want vMAJOR.MINOR.PATCH)"; exit 1 ;;
           esac
+          # Previous semver tag (the one immediately below this one) — pinned as
+          # the release-notes baseline so notes cover only changes since the last
+          # release. Without it, --generate-notes finds no non-prerelease baseline
+          # (every 0.x is a pre-release) and walks back to the repo start. Empty
+          # for the very first tag.
+          prev="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
+                    | awk -v cur="$tag" '$0==cur{f=1;next} f{print;exit}')"
           {
             echo "tag=$tag"
             echo "version=${tag#v}"
             echo "dry=$dry"
+            echo "prev=$prev"
           } >> "$GITHUB_OUTPUT"
-          echo "Resolved tag=$tag version=${tag#v} dry_run=$dry"
+          echo "Resolved tag=$tag version=${tag#v} dry_run=$dry prev=${prev:-<none>}"
 
       - name: Create GitHub Release (auto-generated notes)
         if: ${{ steps.ctx.outputs.dry == 'false' }}
@@ -65,11 +73,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.ctx.outputs.tag }}
           VERSION: ${{ steps.ctx.outputs.version }}
+          PREV: ${{ steps.ctx.outputs.prev }}
         run: |
           set -euo pipefail
+          args=(--verify-tag --generate-notes --title "$TAG")
+          # Scope notes to changes since the previous tag (see the Resolve step).
+          if [ -n "$PREV" ]; then
+            args+=(--notes-start-tag "$PREV")
+            echo "Release notes scoped to $PREV..$TAG."
+          fi
           # Pre-1.0: mark 0.x as a pre-release to match the existing v0.1.0–v0.6.0
           # convention. At v1.0.0+ this falls away and the release is "Latest".
-          args=(--verify-tag --generate-notes --title "$TAG")
           if [ "${VERSION%%.*}" = "0" ]; then
             args+=(--prerelease)
             echo "0.x version — creating as a pre-release."
@@ -87,12 +101,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.ctx.outputs.tag }}
+          PREV: ${{ steps.ctx.outputs.prev }}
         run: |
           set -euo pipefail
-          echo "DRY RUN — notes that would be generated for $TAG:"
+          echo "DRY RUN — notes that would be generated for $TAG (baseline ${PREV:-<repo start>}):"
           echo "-----------------------------------------------------------------"
-          gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
-            -f tag_name="$TAG" --jq '.body'
+          if [ -n "$PREV" ]; then
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$TAG" -f previous_tag_name="$PREV" --jq '.body'
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$TAG" --jq '.body'
+          fi
           echo "-----------------------------------------------------------------"
 
       - name: Verify the Terraform Registry published the version

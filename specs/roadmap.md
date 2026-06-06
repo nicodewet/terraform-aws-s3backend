@@ -1,6 +1,7 @@
 # Roadmap
 
-A high-level implementation order derived from `TODO.md` and aligned with
+A high-level implementation order originally derived from the repo's early
+`TODO.md` (since removed in Phase 6 — git history preserves it) and aligned with
 [[mission]] and [[tech-stack]]. Phases are intentionally small — each one
 should land as a focused PR (or a tight series). Order matters: later
 phases assume earlier ones are green.
@@ -135,18 +136,18 @@ and `git push --tags`.
 **Goal.** Pay down the small debts left after Phases 0–5, now that the
 spec / CI / release machinery is the source of truth.
 
-- **Remove the redundant top-level `TODO.md`.** Its "Now / Next" notes are the
-  pre-spec scratch that became Phases 0–2; [[mission]], [[roadmap]] and
-  [[tech-stack]] now carry that intent. Delete it — git history preserves it.
+- **Remove the redundant top-level `TODO.md`.** ✅ Done — the pre-spec scratch
+  (its "Now / Next" became Phases 0–2) was deleted; [[mission]], [[roadmap]] and
+  [[tech-stack]] carry that intent now. Git history preserves it.
 - **Fix the "module works" badge label.** ✅ Done — the e2e workflow was renamed
   `E2E Module Test` → `Module Works`, so the native badge now renders
   "Module Works", matching the README prose and the [[mission]] success signal.
   The badge URL is by filename (`e2e-test.yml/badge.svg`), so it kept working.
-- **Constrain auto-generated release notes.** Because every 0.x release is a
-  pre-release, `gh release --generate-notes` finds no prior non-prerelease
-  baseline and walks back to the repo start (`v0.7.0`'s notes listed the entire
-  history). Pin the baseline (e.g. `--notes-start-tag`) or accept it until the
-  first non-prerelease `v1.0.0`.
+- **Constrain auto-generated release notes.** ✅ Done — `release.yml` now
+  computes the previous semver tag and passes `--notes-start-tag`, so notes
+  cover only changes since the last release (fixing the walk-back-to-repo-start
+  that bloated `v0.7.0`'s notes). Takes effect from the next tag (`v0.7.0` is
+  already published).
 - **Decide the fate of the Phase 0 PoC** (`ci/poc-decide-ci-substrate.sh` +
   `ci/poc-fixture/`), kept as a local quick-check in Phase 2 — retire it now
   that Terratest is the harness, or keep it and note why.
