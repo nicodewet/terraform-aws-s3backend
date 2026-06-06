@@ -11,7 +11,7 @@
 # refs/heads/main + refs/tags/* anyway (defence in depth). Triggers are
 # push-to-main (Phase 2, Option A) and a daily schedule (Phase 3); both run on
 # the default branch, so neither widens the trust surface.
-name: E2E Module Test
+name: Module Works
 
 on:
   push:

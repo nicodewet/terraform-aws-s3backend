@@ -130,7 +130,7 @@ and `git push --tags`.
 
 ## Phase 6 — Cleanup & hygiene
 
-**Status: 🔜 Planned (2026-06-06).**
+**Status: 🚧 In progress (started 2026-06-06).**
 
 **Goal.** Pay down the small debts left after Phases 0–5, now that the
 spec / CI / release machinery is the source of truth.
@@ -138,12 +138,10 @@ spec / CI / release machinery is the source of truth.
 - **Remove the redundant top-level `TODO.md`.** Its "Now / Next" notes are the
   pre-spec scratch that became Phases 0–2; [[mission]], [[roadmap]] and
   [[tech-stack]] now carry that intent. Delete it — git history preserves it.
-- **Fix the "module works" badge label.** A native badge renders the *workflow
-  name* — currently `E2E Module Test` — while the README prose and the
-  [[mission]] success signal call it "module works". Rename the e2e workflow to
-  `Module Works` (recommended — the badge then says what the mission promises;
-  the badge URL is by filename, so it keeps working) **or** reword the prose.
-  Pick one so they agree.
+- **Fix the "module works" badge label.** ✅ Done — the e2e workflow was renamed
+  `E2E Module Test` → `Module Works`, so the native badge now renders
+  "Module Works", matching the README prose and the [[mission]] success signal.
+  The badge URL is by filename (`e2e-test.yml/badge.svg`), so it kept working.
 - **Constrain auto-generated release notes.** Because every 0.x release is a
   pre-release, `gh release --generate-notes` finds no prior non-prerelease
   baseline and walks back to the repo start (`v0.7.0`'s notes listed the entire
