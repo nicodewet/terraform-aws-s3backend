@@ -131,7 +131,7 @@ and `git push --tags`.
 
 ## Phase 6 — Cleanup & hygiene
 
-**Status: 🚧 In progress (started 2026-06-06).**
+**Status: ✅ Done (2026-06-06).**
 
 **Goal.** Pay down the small debts left after Phases 0–5, now that the
 spec / CI / release machinery is the source of truth.
@@ -148,9 +148,9 @@ spec / CI / release machinery is the source of truth.
   cover only changes since the last release (fixing the walk-back-to-repo-start
   that bloated `v0.7.0`'s notes). Takes effect from the next tag (`v0.7.0` is
   already published).
-- **Decide the fate of the Phase 0 PoC** (`ci/poc-decide-ci-substrate.sh` +
-  `ci/poc-fixture/`), kept as a local quick-check in Phase 2 — retire it now
-  that Terratest is the harness, or keep it and note why.
+- **Decide the fate of the Phase 0 PoC.** ✅ Done — retired
+  `ci/poc-decide-ci-substrate.sh` + `ci/poc-fixture/` now that Terratest
+  (`test/`) is the harness and runs locally too. Git history preserves them.
 
 **Note.** Documentation changes reach the Terraform Registry only at the next
 semver tag — the Registry renders the README from the latest *published* version
