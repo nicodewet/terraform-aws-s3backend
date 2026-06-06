@@ -98,6 +98,10 @@ manual intervention.
 
 ## Phase 4 — Public "module works" badge
 
+**Status: ✅ Done (2026-06-06).** Live `e2e-test.yml` badge (`?branch=main`) on
+the README badge row + an honest paragraph on what it proves. See
+`specs/2026-06-06-phase-4-module-works-badge/`.
+
 **Goal.** Give Terraform Registry consumers a visible trust signal.
 
 - Add the Phase 2/3 workflow status badge to README, alongside the
