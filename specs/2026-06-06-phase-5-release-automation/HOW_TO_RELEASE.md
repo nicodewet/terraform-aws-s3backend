@@ -43,6 +43,10 @@ breaking changes may still ship in a minor; cutting `v1.0.0` is a separate,
 deliberate decision (out of scope here). The workflow does **not** pick or bump
 the version — you choose the tag.
 
+While the module is `0.x`, the workflow marks each Release as a **pre-release**
+(matching the existing `v0.1.0`–`v0.6.0` convention). The first `v1.0.0` tag
+will be created as a normal "Latest" release automatically.
+
 ## If the Registry-verify step fails
 
 The GitHub Release was still created; only the external Registry ingestion
