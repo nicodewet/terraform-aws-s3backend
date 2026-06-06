@@ -45,7 +45,9 @@ scoped `issues: write` (on that job alone, not the AWS-touching job).
 - Published as `nicodewet/s3backend/aws` on the Terraform Registry.
 - Versioning: semantic version git tags trigger Registry publication
   automatically — the tag IS the release.
-- No release automation yet (manual tag-and-push by the maintainer).
+- Releasing is one manual step — `git tag vX.Y.Z && git push --tags`. The
+  `release.yml` workflow then creates a GitHub Release with auto-generated notes
+  and verifies the Registry published the version (Phase 5).
 
 ## Gaps (highest priority first)
 
@@ -113,8 +115,13 @@ These are the deliberate "not done yet" pieces. Order matches [[roadmap]].
    real run was green. See `specs/2026-06-06-phase-4-module-works-badge/`.
 
 6. **Release automation.**
-   Once the above is green, automate tag → changelog → Registry signal.
-   Lowest priority — manual tagging is fine for now.
+   *Status: implemented 2026-06-06 — pending first tagged release to prove
+   end-to-end.* `release.yml` reacts to a semver tag push: it creates a GitHub
+   Release with auto-generated notes, then polls the public Registry versions
+   API until the new version (`tag` minus `v`) appears. The tag stays the source
+   of truth (no auto-tagging); the workflow needs only `contents: write` — no
+   AWS/OIDC. `workflow_dispatch` runs a dry-run (notes preview + verify poll, no
+   Release). See `specs/2026-06-06-phase-5-release-automation/`.
 
 ## Things We've Explicitly Decided NOT to Adopt (yet)
 

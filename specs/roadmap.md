@@ -113,6 +113,12 @@ the README badge row + an honest paragraph on what it proves. See
 
 ## Phase 5 — Release automation (lowest priority)
 
+**Status: ✅ Implemented (2026-06-06); pending first tagged release.**
+`release.yml` reacts to a semver tag: GitHub Release with auto-generated notes +
+Registry-pickup verification, `contents: write` only. See
+`specs/2026-06-06-phase-5-release-automation/`. Proven end-to-end on the next
+genuine `vX.Y.Z`.
+
 **Goal.** Make cutting a Registry version low-friction.
 
 - Generate a changelog from commit/PR titles between tags.

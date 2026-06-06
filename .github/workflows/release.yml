@@ -1,0 +1,108 @@
+# Release automation — Phase 5 (spec: specs/2026-06-06-phase-5-release-automation/).
+#
+# The git tag IS the release: pushing a semver tag (vX.Y.Z) makes the Terraform
+# Registry publish `nicodewet/s3backend/aws` automatically. This workflow adds
+# the human-readable half — it creates a GitHub Release with auto-generated
+# notes for the tag, then verifies the Registry actually ingested the version.
+#
+# Releasing stays a one-step manual action for the maintainer:
+#     git tag vX.Y.Z && git push --tags
+# Everything below is automatic. No e2e gate (Option A): the tag comes off a
+# green `main`. No AWS — releasing touches GitHub + the public Registry only,
+# so this workflow needs only `contents: write`, never OIDC/id-token.
+#
+# workflow_dispatch is a DRY RUN: it previews the generated notes and exercises
+# the Registry-verify poll against an existing tag WITHOUT creating a Release.
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to dry-run notes + Registry verify against (no Release is created)"
+        required: true
+
+permissions:
+  contents: write # create the GitHub Release + read tags/history; nothing else
+
+jobs:
+  release:
+    name: Publish GitHub Release + verify Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history so notes can diff against the previous tag)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag and mode
+        id: ctx
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+            dry="true"
+          else
+            tag="${GITHUB_REF_NAME}"
+            dry="false"
+          fi
+          case "$tag" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::unexpected tag format: $tag (want vMAJOR.MINOR.PATCH)"; exit 1 ;;
+          esac
+          {
+            echo "tag=$tag"
+            echo "version=${tag#v}"
+            echo "dry=$dry"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved tag=$tag version=${tag#v} dry_run=$dry"
+
+      - name: Create GitHub Release (auto-generated notes)
+        if: ${{ steps.ctx.outputs.dry == 'false' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.ctx.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # Idempotent: re-running on an existing tag must not error or duplicate.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — skipping creation."
+          else
+            gh release create "$TAG" --verify-tag --generate-notes --title "$TAG"
+            echo "Created GitHub Release $TAG."
+          fi
+
+      - name: Dry run — preview generated notes (no Release created)
+        if: ${{ steps.ctx.outputs.dry == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.ctx.outputs.tag }}
+        run: |
+          set -euo pipefail
+          echo "DRY RUN — notes that would be generated for $TAG:"
+          echo "-----------------------------------------------------------------"
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f tag_name="$TAG" --jq '.body'
+          echo "-----------------------------------------------------------------"
+
+      - name: Verify the Terraform Registry published the version
+        env:
+          VERSION: ${{ steps.ctx.outputs.version }}
+        run: |
+          set -euo pipefail
+          api="https://registry.terraform.io/v1/modules/nicodewet/s3backend/aws/versions"
+          echo "Polling $api for version $VERSION (up to ~10 min; ingestion is webhook-driven)…"
+          for attempt in $(seq 1 20); do
+            if curl -fsS "$api" \
+                 | jq -e --arg v "$VERSION" 'any(.modules[0].versions[]; .version == $v)' >/dev/null; then
+              echo "OK — the Registry lists version $VERSION."
+              exit 0
+            fi
+            echo "attempt $attempt/20: version $VERSION not listed yet; sleeping 30s"
+            sleep 30
+          done
+          echo "::error::Registry did not list version $VERSION within ~10 min."
+          echo "Note: the GitHub Release (if created) succeeded — this step depends on the Registry's webhook ingestion of the tag. Check the Registry/webhook before assuming the release is consumable."
+          exit 1
