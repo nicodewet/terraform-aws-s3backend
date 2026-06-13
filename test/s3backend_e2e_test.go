@@ -113,11 +113,21 @@ func TestS3BackendEndToEnd(t *testing.T) {
 		// make the deferred Destroy resilient to the same propagation window.
 		MaxRetries:         8,
 		TimeBetweenRetries: 10 * time.Second,
+		// Terraform hard-wraps error messages at ~72 columns, so a phrase like
+		// "...GitHubActions is\nnot authorized to perform: sts:AssumeRole" lands
+		// a newline mid-phrase. Terratest matches these patterns against the
+		// full multi-line output with Go's regexp, where `.` does NOT cross
+		// newlines by default — so a pattern that spans the wrap silently never
+		// matches and the command is treated as fatal (no retry). The `(?s)`
+		// flag makes `.` match newlines; we also avoid pinning to a literal
+		// space that the wrap may replace (match "not authorized", not "is not
+		// authorized"). Without this, the assume-role 403 is not retried and the
+		// scheduled run flakes red whenever IAM hasn't propagated within ~1s.
 		RetryableTerraformErrors: map[string]string{
-			".*is not authorized to perform: sts:AssumeRole.*": "module role not yet assumable (IAM eventual consistency)",
-			".*failed to refresh cached credentials.*":         "module role not yet assumable (IAM eventual consistency)",
-			".*HeadObject.*StatusCode: 403.*":                  "module role policy not yet propagated (IAM eventual consistency)",
-			".*api error Forbidden.*":                          "module role policy not yet propagated (IAM eventual consistency)",
+			"(?s).*not authorized to perform: sts:AssumeRole.*": "module role not yet assumable (IAM eventual consistency)",
+			"(?s).*failed to refresh cached credentials.*":      "module role not yet assumable (IAM eventual consistency)",
+			"(?s).*HeadObject.*StatusCode: 403.*":               "module role policy not yet propagated (IAM eventual consistency)",
+			"(?s).*api error Forbidden.*":                       "module role policy not yet propagated (IAM eventual consistency)",
 		},
 	}
 	defer terraform.Destroy(t, consumerOpts)
