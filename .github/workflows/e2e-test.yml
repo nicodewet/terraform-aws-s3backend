@@ -85,6 +85,11 @@ jobs:
       - name: Open or update the drift issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This job has no checkout, so gh can't infer the repo from a local
+          # git remote — without GH_REPO every gh call dies with "fatal: not a
+          # git repository" and the drift alert is silently lost. Setting it
+          # explicitly is lighter than adding actions/checkout just for this.
+          GH_REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
